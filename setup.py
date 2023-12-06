@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 VERSION = "0.0.1-alpha-dev" 
 DESCRIPTION = "Equipy is a tool for fast, online fairness calibration"
 
-with open("README.md", "r") as f:
+with open("README.rst", "r") as f:
     long_description = f.read()
 LONG_DESCRIPTION = long_description
 
