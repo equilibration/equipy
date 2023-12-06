@@ -26,6 +26,7 @@ EquiPy requires:
 - Pandas (== 2.0.3)
 - Statsmodels (== 0.14.0)
 - Seaborn (== 0.12.2)
+- POT (==0.9.1)
 
 User installation
 ~~~~~~~~~~~~~~~~~

@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-VERSION = "0.0.2-alpha-dev" 
+VERSION = "0.0.3-alpha-dev" 
 DESCRIPTION = "Equipy is a tool for fast, online fairness calibration"
 
 with open("README.rst", "r") as f:
@@ -17,7 +17,7 @@ setup(
         packages=find_packages(include=["equipy", "equipy.*"]),
         install_requires=["numpy", "scipy", "scikit-learn",
                           "matplotlib", "pandas", "statsmodels",
-                          "seaborn"], 
+                          "seaborn", "POT"], 
         setup_requires=["pytest-runner"],
         tests_require=["pytest"],
         keywords=["fairness", "wasserstein"],
