@@ -1,9 +1,11 @@
+![build passing](https://github.com/phi-ra/equnabc/actions/workflows/build-package.yml/badge.svg)
+
 # EquiPy
 
 **EquiPy** is a Python package implementing sequential fairness on the predicted outputs of Machine Learning models, when dealing with multiple sensitive attributes. This post-processing method progressively achieve fairness accross a set of sensitive features by leveraging multi-marginal Wasserstein barycenters, which extends the standard notion of Strong Demographic Parity to the case with multiple sensitive characteristics. This approach seamlessly extends
 to approximate fairness, enveloping a framework accommodating the trade-off between performance and unfairness.
 
-The project was started in 2023 by François Hu, Philipp Ratz, Suzie Grondin and Agathe Fernandes Machado, following the release of this paper "A Sequentially Fair Mechanism for Multiple Sensitive Attributes" (https://arxiv.org/pdf/2309.06627.pdf), written by François Hu, Philipp Ratz and Arthur Charpentier.  
+The project was started in 2023 by François Hu, Philipp Ratz, Suzie Grondin, Agathe Fernandes Machado and Arthur Charpentier, following the release of this paper "A Sequentially Fair Mechanism for Multiple Sensitive Attributes" (https://arxiv.org/pdf/2309.06627.pdf), written by François Hu, Philipp Ratz and Arthur Charpentier.  
 
 ## Installation
 
@@ -21,10 +23,11 @@ EquiPy requires:
 ### User installation
 
 To install EquiPy, use pip:
-```console
-pip install git+https://github.com/a19ferna/equipy#egg=EquiPy
 
+```console
+pip install equipy
 ```
+
 ## Visualization
 
 This package contains the module **graphs** which allows visualization of the resulting sequential fairness applied to a response variable.
@@ -40,9 +43,9 @@ For further details, check the notebooks in the following folder: https://github
 
 Mailing list:
 * hu.faugon@gmail.com
-* suzie.grondin@ensae.fr
+* suzie.grondin@gmail.com
 * ratz.philipp@courrier.uqam.ca
 * fernandes_machado.agathe@courrier.uqam.ca
-
+* arthur.charpentier@gmail.com
 
 
