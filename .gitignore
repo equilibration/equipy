@@ -1,0 +1,18 @@
+# Ignore everything
+*
+!.gitignore
+!*.yml
+!*.py
+!*.md
+!requirements.txt
+!LICENSE
+!template.latex
+!*/
+
+examples/**/*
+notebooks/**/*
+
+cenv*
+venv*
+.venv*
+data*

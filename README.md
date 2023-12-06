@@ -1,3 +1,5 @@
+![build passing](https://github.com/phi-ra/equnabc/actions/workflows/build-package.yml/badge.svg)
+
 # EquiPy
 
 **EquiPy** is a Python package implementing sequential fairness on the predicted outputs of Machine Learning models, when dealing with multiple sensitive attributes. This post-processing method progressively achieve fairness accross a set of sensitive features by leveraging multi-marginal Wasserstein barycenters, which extends the standard notion of Strong Demographic Parity to the case with multiple sensitive characteristics. This approach seamlessly extends
@@ -21,10 +23,11 @@ EquiPy requires:
 ### User installation
 
 To install EquiPy, use pip:
-```console
-pip install git+https://github.com/a19ferna/equipy#egg=EquiPy
 
+```console
+pip install equipy
 ```
+
 ## Visualization
 
 This package contains the module **graphs** which allows visualization of the resulting sequential fairness applied to a response variable.
@@ -43,6 +46,5 @@ Mailing list:
 * suzie.grondin@ensae.fr
 * ratz.philipp@courrier.uqam.ca
 * fernandes_machado.agathe@courrier.uqam.ca
-
 
 
