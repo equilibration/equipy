@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-VERSION = "0.0.0-alpha-dev" 
+VERSION = "0.0.1-alpha-dev" 
 DESCRIPTION = "Equipy is a tool for fast, online fairness calibration"
 
 with open("README.md", "r") as f:
