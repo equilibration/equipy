@@ -4,6 +4,7 @@
 !*.yml
 !*.py
 !*.md
+!*.rst
 !requirements.txt
 !LICENSE
 !template.latex
