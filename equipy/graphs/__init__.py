@@ -7,4 +7,4 @@ __all__ = [
     'fair_multiple_arrow_plot',
     'fair_density_plot',
     'fair_waterfall_plot'
-    ]
+]

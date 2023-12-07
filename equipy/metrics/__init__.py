@@ -4,4 +4,4 @@ from ._performance_metrics import performance
 __all__ = [
     'unfairness',
     'performance'
-    ]
+]
