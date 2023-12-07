@@ -12,6 +12,7 @@
 
 examples/**/*
 notebooks/**/*
+!docs/**/*
 
 cenv*
 venv*
