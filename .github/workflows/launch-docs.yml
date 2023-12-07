@@ -26,6 +26,7 @@ jobs:
     - name: Build docs
       run: |
         cd docs
+        pip install -r doc_reqs.txt
         make html
     - name: Deploy
       if: success()
