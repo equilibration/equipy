@@ -298,7 +298,11 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-contents">Module contents</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-equipy.metrics">Module contents</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#equipy.metrics.performance"><code class="docutils literal notranslate"><span class="pre">performance()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#equipy.metrics.unfairness"><code class="docutils literal notranslate"><span class="pre">unfairness()</span></code></a></li>
+</ul>
+</li>
 </ul>
             </nav>
         </div>
@@ -312,8 +316,76 @@ document.write(`
                   
   <section id="equipy-metrics-package">
 <h1>equipy.metrics package<a class="headerlink" href="#equipy-metrics-package" title="Permalink to this heading">#</a></h1>
-<section id="module-contents">
-<h2>Module contents<a class="headerlink" href="#module-contents" title="Permalink to this heading">#</a></h2>
+<section id="module-equipy.metrics">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-equipy.metrics" title="Permalink to this heading">#</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="equipy.metrics.performance">
+<span class="sig-prename descclassname"><span class="pre">equipy.metrics.</span></span><span class="sig-name descname"><span class="pre">performance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y_true</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_pred</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metric=&lt;function</span> <span class="pre">mean_squared_error&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/equipy/metrics/_performance_metrics.html#performance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#equipy.metrics.performance" title="Permalink to this definition">#</a></dt>
+<dd><p>Compute the performance value for predicted fair output compared to the true labels.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>y_true</strong> (<em>array-like</em>) – True labels or ground truth values.</p></li>
+<li><p><strong>y_pred</strong> (<em>array-like</em>) – Predicted (fair or not) output values.</p></li>
+<li><p><strong>metric</strong> (<em>callable</em><em>, </em><em>optional</em>) – The metric used to compute the performance, default=sklearn.metrics.mean_square_error.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The calculated performance value.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">y_true</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y_pred</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">classification_performance</span> <span class="o">=</span> <span class="n">compute_performance</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">classification_performance</span><span class="p">)</span>
+<span class="go">0.6</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">y_true</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1.2</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">,</span> <span class="mf">3.8</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">,</span> <span class="mf">5.2</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y_pred</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.7</span><span class="p">,</span> <span class="mf">3.5</span><span class="p">,</span> <span class="mf">4.2</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">regression_performance</span> <span class="o">=</span> <span class="n">compute_performance</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">regression_performance</span><span class="p">)</span>
+<span class="go">0.05</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="equipy.metrics.unfairness">
+<span class="sig-prename descclassname"><span class="pre">equipy.metrics.</span></span><span class="sig-name descname"><span class="pre">unfairness</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sensitive_features</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_min</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/equipy/metrics/_fairness_metrics.html#unfairness"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#equipy.metrics.unfairness" title="Permalink to this definition">#</a></dt>
+<dd><p>Compute the unfairness value for a given fair output (y) and multiple sensitive attributes data (sensitive_features) containing several modalities.
+If there is a single sensitive feature, it calculates the maximum quantile difference between different modalities of that single sensitive feature.
+If there are multiple sensitive features, it calculates the maximum quantile difference for each sensitive feature
+and then takes the maximum of these maximums.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>y</strong> (<em>array-like</em>) – Predicted (fair or not) output data.</p></li>
+<li><p><strong>sensitive_features</strong> (<em>array-like</em>) – Sensitive attribute data.</p></li>
+<li><p><strong>n_min</strong> (<em>float</em>) – Below this threshold, compute the unfairness based on the Wasserstein distance.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Unfairness value in the dataset.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">5</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">9</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sensitive_features</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]])</span><span class="o">.</span><span class="n">T</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">unf</span> <span class="o">=</span> <span class="n">compute_unfairness</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">sensitive_features</span><span class="p">,</span> <span class="n">n_min</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">unf</span><span class="p">)</span>
+<span class="go">6.0</span>
+</pre></div>
+</div>
+</dd></dl>
+
 </section>
 </section>
 
@@ -361,7 +433,11 @@ document.write(`
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-contents">Module contents</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-equipy.metrics">Module contents</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#equipy.metrics.performance"><code class="docutils literal notranslate"><span class="pre">performance()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#equipy.metrics.unfairness"><code class="docutils literal notranslate"><span class="pre">unfairness()</span></code></a></li>
+</ul>
+</li>
 </ul>
   </nav></div>
 

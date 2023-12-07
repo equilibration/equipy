@@ -298,7 +298,23 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-contents">Module contents</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-equipy.fairness">Module contents</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#equipy.fairness.MultiWasserstein"><code class="docutils literal notranslate"><span class="pre">MultiWasserstein</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#equipy.fairness.MultiWasserstein.sigma"><code class="docutils literal notranslate"><span class="pre">MultiWasserstein.sigma</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#equipy.fairness.MultiWasserstein.y_fair"><code class="docutils literal notranslate"><span class="pre">MultiWasserstein.y_fair</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#equipy.fairness.MultiWasserstein.modalities_calib_all"><code class="docutils literal notranslate"><span class="pre">MultiWasserstein.modalities_calib_all</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#equipy.fairness.MultiWasserstein.weights_all"><code class="docutils literal notranslate"><span class="pre">MultiWasserstein.weights_all</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#equipy.fairness.MultiWasserstein.ecdf_all"><code class="docutils literal notranslate"><span class="pre">MultiWasserstein.ecdf_all</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#equipy.fairness.MultiWasserstein.eqf_all"><code class="docutils literal notranslate"><span class="pre">MultiWasserstein.eqf_all</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#equipy.fairness.MultiWasserstein.fit"><code class="docutils literal notranslate"><span class="pre">MultiWasserstein.fit()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#equipy.fairness.MultiWasserstein.transform"><code class="docutils literal notranslate"><span class="pre">MultiWasserstein.transform()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#equipy.fairness.MultiWasserstein.get_sequential_fairness"><code class="docutils literal notranslate"><span class="pre">MultiWasserstein.get_sequential_fairness()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id0"><code class="docutils literal notranslate"><span class="pre">MultiWasserstein.fit()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id1"><code class="docutils literal notranslate"><span class="pre">MultiWasserstein.transform()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
             </nav>
         </div>
@@ -312,8 +328,171 @@ document.write(`
                   
   <section id="equipy-fairness-package">
 <h1>equipy.fairness package<a class="headerlink" href="#equipy-fairness-package" title="Permalink to this heading">#</a></h1>
-<section id="module-contents">
-<h2>Module contents<a class="headerlink" href="#module-contents" title="Permalink to this heading">#</a></h2>
+<section id="module-equipy.fairness">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-equipy.fairness" title="Permalink to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="equipy.fairness.MultiWasserstein">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">equipy.fairness.</span></span><span class="sig-name descname"><span class="pre">MultiWasserstein</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0001</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/equipy/fairness/_wasserstein.html#MultiWasserstein"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#equipy.fairness.MultiWasserstein" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class extending FairWasserstein for multi-sensitive attribute fairness adjustment.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>sigma</strong> (<em>float</em><em>, </em><em>optional</em><em> (</em><em>default=0.0001</em><em>)</em>) – Standard deviation of the random noise added during fairness adjustment.</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="equipy.fairness.MultiWasserstein.sigma">
+<span class="sig-name descname"><span class="pre">sigma</span></span><a class="headerlink" href="#equipy.fairness.MultiWasserstein.sigma" title="Permalink to this definition">#</a></dt>
+<dd><p>Standard deviation of the random noise added during fairness adjustment.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="equipy.fairness.MultiWasserstein.y_fair">
+<span class="sig-name descname"><span class="pre">y_fair</span></span><a class="headerlink" href="#equipy.fairness.MultiWasserstein.y_fair" title="Permalink to this definition">#</a></dt>
+<dd><p>Dictionary storing fair predictions for each sensitive feature.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="equipy.fairness.MultiWasserstein.modalities_calib_all">
+<span class="sig-name descname"><span class="pre">modalities_calib_all</span></span><a class="headerlink" href="#equipy.fairness.MultiWasserstein.modalities_calib_all" title="Permalink to this definition">#</a></dt>
+<dd><p>Dictionary storing modality values obtained from calibration data for all sensitive features.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="equipy.fairness.MultiWasserstein.weights_all">
+<span class="sig-name descname"><span class="pre">weights_all</span></span><a class="headerlink" href="#equipy.fairness.MultiWasserstein.weights_all" title="Permalink to this definition">#</a></dt>
+<dd><p>Dictionary storing weights (probabilities) for each modality based on their occurrences in calibration data
+for all sensitive features.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="equipy.fairness.MultiWasserstein.ecdf_all">
+<span class="sig-name descname"><span class="pre">ecdf_all</span></span><a class="headerlink" href="#equipy.fairness.MultiWasserstein.ecdf_all" title="Permalink to this definition">#</a></dt>
+<dd><p>Dictionary storing ECDF (Empirical Cumulative Distribution Function) objects for each sensitive modality
+for all sensitive features.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="equipy.fairness.MultiWasserstein.eqf_all">
+<span class="sig-name descname"><span class="pre">eqf_all</span></span><a class="headerlink" href="#equipy.fairness.MultiWasserstein.eqf_all" title="Permalink to this definition">#</a></dt>
+<dd><p>Dictionary storing EQF (Empirical Quantile Function) objects for each sensitive modality
+for all sensitive features.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="equipy.fairness.MultiWasserstein.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sensitive_features</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/equipy/fairness/_wasserstein.html#MultiWasserstein.fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#equipy.fairness.MultiWasserstein.fit" title="Permalink to this definition">#</a></dt>
+<dd><p>Fit the multi-sensitive attribute fairness adjustment model using calibration data.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="equipy.fairness.MultiWasserstein.transform">
+<span class="sig-name descname"><span class="pre">transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sensitive_features</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/equipy/fairness/_wasserstein.html#MultiWasserstein.transform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#equipy.fairness.MultiWasserstein.transform" title="Permalink to this definition">#</a></dt>
+<dd><p>Transform test data to enforce fairness using Wasserstein distance for multiple sensitive attributes.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="equipy.fairness.MultiWasserstein.get_sequential_fairness">
+<span class="sig-name descname"><span class="pre">get_sequential_fairness</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#equipy.fairness.MultiWasserstein.get_sequential_fairness" title="Permalink to this definition">#</a></dt>
+<dd><p>Get fair predictions for each sensitive feature, applied step by step.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id0">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sensitive_features</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/equipy/fairness/_wasserstein.html#MultiWasserstein.fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id0" title="Permalink to this definition">#</a></dt>
+<dd><p>Perform fit on the calibration data and save the ECDF, EQF, and weights for each sensitive variable.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>y</strong> (<em>array-like</em><em>, </em><em>shape</em><em> (</em><em>n_samples</em><em>,</em><em>)</em>) – The calibration labels.</p></li>
+<li><p><strong>sensitive_features</strong> (<em>array-like</em><em>, </em><em>shape</em><em> (</em><em>n_samples</em><em>, </em><em>n_sensitive_features</em><em>)</em>) – The calibration samples representing multiple sensitive attributes.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>This method computes the ECDF (Empirical Cumulative Distribution Function),
+EQF (Empirical Quantile Function), and weights for each sensitive variable
+based on the provided calibration data. These computed values are used
+during the transformation process to ensure fairness in predictions.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id1">
+<span class="sig-name descname"><span class="pre">transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sensitive_features</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/equipy/fairness/_wasserstein.html#MultiWasserstein.transform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id1" title="Permalink to this definition">#</a></dt>
+<dd><p>Transform the test data to enforce fairness using Wasserstein distance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>y</strong> (<em>array-like</em><em>, </em><em>shape</em><em> (</em><em>n_samples</em><em>,</em><em>)</em>) – The target values of the test data.</p></li>
+<li><p><strong>sensitive_features</strong> (<em>array-like</em><em>, </em><em>shape</em><em> (</em><em>n_samples</em><em>, </em><em>n_sensitive_features</em><em>)</em>) – The test samples representing multiple sensitive attributes.</p></li>
+<li><p><strong>epsilon</strong> (<em>list</em><em>, </em><em>shape</em><em> (</em><em>n_sensitive_features</em><em>,</em><em>)</em><em>, </em><em>optional</em><em> (</em><em>default=None</em><em>)</em>) – The fairness parameters controlling the trade-off between fairness and accuracy
+for each sensitive feature. If None, no fairness constraints are applied.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>y_fair</strong> – Fair predictions for the test data after enforcing fairness constraints.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>array-like, shape (n_samples,)</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>This method applies Wasserstein distance-based fairness adjustment to the test data
+using the precomputed ECDF (Empirical Cumulative Distribution Function),
+EQF (Empirical Quantile Function), and weights obtained from the calibration data.
+Random noise within the range of [-sigma, sigma] is added to the test data to ensure fairness.
+The parameter epsilon is a list, where each element controls the trade-off between fairness and accuracy
+for the corresponding sensitive feature.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">wasserstein</span> <span class="o">=</span> <span class="n">MultiWasserStein</span><span class="p">(</span><span class="n">sigma</span><span class="o">=</span><span class="mf">0.001</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.6</span><span class="p">,</span> <span class="mf">0.43</span><span class="p">,</span> <span class="mf">0.32</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sensitive_features</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="s1">&#39;blue&#39;</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;blue&#39;</span><span class="p">,</span> <span class="mi">9</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;green&#39;</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;green&#39;</span><span class="p">,</span> <span class="mi">9</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">wasserstein</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">sensitive_features</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.35</span><span class="p">,</span> <span class="mf">0.23</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sensitive_features</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="s1">&#39;blue&#39;</span><span class="p">,</span> <span class="mi">9</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;blue&#39;</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;blue&#39;</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;green&#39;</span><span class="p">,</span> <span class="mi">9</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">epsilon</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fair_predictions</span> <span class="o">=</span> <span class="n">wasserstein</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">sensitive_features</span><span class="p">,</span> <span class="n">epsilon</span><span class="o">=</span><span class="n">epsilon</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">fair_predictions</span><span class="p">)</span>
+<span class="go">[0.7015008  0.37444565 0.37204565 0.37144565]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
 </section>
 </section>
 
@@ -361,7 +540,23 @@ document.write(`
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-contents">Module contents</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-equipy.fairness">Module contents</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#equipy.fairness.MultiWasserstein"><code class="docutils literal notranslate"><span class="pre">MultiWasserstein</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#equipy.fairness.MultiWasserstein.sigma"><code class="docutils literal notranslate"><span class="pre">MultiWasserstein.sigma</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#equipy.fairness.MultiWasserstein.y_fair"><code class="docutils literal notranslate"><span class="pre">MultiWasserstein.y_fair</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#equipy.fairness.MultiWasserstein.modalities_calib_all"><code class="docutils literal notranslate"><span class="pre">MultiWasserstein.modalities_calib_all</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#equipy.fairness.MultiWasserstein.weights_all"><code class="docutils literal notranslate"><span class="pre">MultiWasserstein.weights_all</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#equipy.fairness.MultiWasserstein.ecdf_all"><code class="docutils literal notranslate"><span class="pre">MultiWasserstein.ecdf_all</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#equipy.fairness.MultiWasserstein.eqf_all"><code class="docutils literal notranslate"><span class="pre">MultiWasserstein.eqf_all</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#equipy.fairness.MultiWasserstein.fit"><code class="docutils literal notranslate"><span class="pre">MultiWasserstein.fit()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#equipy.fairness.MultiWasserstein.transform"><code class="docutils literal notranslate"><span class="pre">MultiWasserstein.transform()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#equipy.fairness.MultiWasserstein.get_sequential_fairness"><code class="docutils literal notranslate"><span class="pre">MultiWasserstein.get_sequential_fairness()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id0"><code class="docutils literal notranslate"><span class="pre">MultiWasserstein.fit()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id1"><code class="docutils literal notranslate"><span class="pre">MultiWasserstein.transform()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
   </nav></div>
 
