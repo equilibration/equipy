@@ -1,6 +1,10 @@
+"""Main Classes to make predictions fair."""
+
 import numpy as np
 from ..utils.checkers import _check_epsilon, _check_epsilon_size, _check_mod, _check_shape, _check_nb_observations
-from  ._base import BaseHelper
+from ._base import BaseHelper
+from typing import Optional
+
 
 class FairWasserstein(BaseHelper):
     """
@@ -32,21 +36,21 @@ class FairWasserstein(BaseHelper):
         Transform test data to enforce fairness using Wasserstein distance.
     """
 
-    def __init__(self, sigma=0.0001):
+    def __init__(self, sigma: float = 0.0001):
         super().__init__()
         self.sigma = sigma
         self.modalities_calib = None
 
-    def fit(self, y, sensitive_feature):
+    def fit(self, y: np.ndarray, sensitive_feature: np.ndarray) -> None:
         """
         Perform fit on the calibration data and save the ECDF, EQF, and weights of the sensitive variable.
 
         Parameters
         ----------
-        y : array-like, shape (n_samples,)
+        y : np.ndarray, shape (n_samples,)
             The calibration labels.
 
-        sensitive_feature : array-like, shape (n_samples,)
+        sensitive_feature : np.ndarray, shape (n_samples,)
             The calibration samples representing one single sensitive attribute.
 
         Returns
@@ -73,16 +77,16 @@ class FairWasserstein(BaseHelper):
         self._compute_weights(sensitive_feature)
         self._estimate_ecdf_eqf(y, sensitive_feature, self.sigma)
 
-    def transform(self, y, sensitive_feature, epsilon=0):
+    def transform(self, y: np.ndarray, sensitive_feature: np.ndarray, epsilon: float = 0) -> np.ndarray:
         """
         Transform the test data to enforce fairness using Wasserstein distance.
 
         Parameters
         ----------
-        y : array-like, shape (n_samples,)
+        y : np.ndarray, shape (n_samples,)
             The target values of the test data.
 
-        sensitive_feature : array-like, shape (n_samples,)
+        sensitive_feature : np.ndarray, shape (n_samples,)
             The test samples representing a single sensitive attribute.
 
         epsilon : float, optional (default=0)
@@ -92,7 +96,7 @@ class FairWasserstein(BaseHelper):
 
         Returns
         -------
-        y_fair : array-like, shape (n_samples,)
+        y_fair : np.ndarray, shape (n_samples,)
             Fair predictions for the test data after enforcing fairness constraints.
 
         Notes
@@ -123,7 +127,7 @@ class FairWasserstein(BaseHelper):
 
         y_fair = self._fair_y_values(y, sensitive_feature, modalities_test)
         return (1-epsilon)*y_fair + epsilon*y
-""
+
 
 class MultiWasserstein():
     """
@@ -162,7 +166,7 @@ class MultiWasserstein():
         Get fair predictions for each sensitive feature, applied step by step.
     """
 
-    def __init__(self, sigma=0.0001):
+    def __init__(self, sigma: float = 0.0001):
         """
         Initialize the MultiWasserStein instance.
 
@@ -186,17 +190,16 @@ class MultiWasserstein():
 
         self.sigma = sigma
 
-
-    def fit(self, y, sensitive_features):
+    def fit(self, y: np.ndarray, sensitive_features: np.ndarray) -> None:
         """
         Perform fit on the calibration data and save the ECDF, EQF, and weights for each sensitive variable.
 
         Parameters
         ----------
-        y : array-like, shape (n_samples,)
+        y : np.ndarray, shape (n_samples,)
             The calibration labels.
 
-        sensitive_features : array-like, shape (n_samples, n_sensitive_features)
+        sensitive_features : np.ndarray, shape (n_samples, n_sensitive_features)
             The calibration samples representing multiple sensitive attributes.
 
         Returns
@@ -213,13 +216,14 @@ class MultiWasserstein():
         _check_nb_observations(sensitive_features)
 
         if sensitive_features.ndim == 1:
-            sensitive_features = np.reshape(sensitive_features, (len(sensitive_features),1))
+            sensitive_features = np.reshape(
+                sensitive_features, (len(sensitive_features), 1))
 
         for i, sens in enumerate(sensitive_features.T):
             wasserstein_instance = FairWasserstein(sigma=self.sigma)
             if i == 0:
                 y_inter = y
-            
+
             wasserstein_instance.fit(y_inter, sens)
             self.modalities_calib_all[f'sensitive_feature_{i+1}'] = wasserstein_instance.modalities_calib
             self.weights_all[f'sensitive_feature_{i+1}'] = wasserstein_instance.weights
@@ -227,16 +231,16 @@ class MultiWasserstein():
             self.ecdf_all[f'sensitive_feature_{i+1}'] = wasserstein_instance.ecdf
             y_inter = wasserstein_instance.transform(y_inter, sens)
 
-    def transform(self, y, sensitive_features, epsilon=None):
+    def transform(self, y: np.ndarray, sensitive_features: np.ndarray, epsilon: Optional[list[float]] = None) -> np.ndarray:
         """
         Transform the test data to enforce fairness using Wasserstein distance.
 
         Parameters
         ----------
-        y : array-like, shape (n_samples,)
+        y : np.ndarray, shape (n_samples,)
             The target values of the test data.
 
-        sensitive_features : array-like, shape (n_samples, n_sensitive_features)
+        sensitive_features : np.ndarray shape (n_samples, n_sensitive_features)
             The test samples representing multiple sensitive attributes.
 
         epsilon : list, shape (n_sensitive_features,), optional (default=None)
@@ -245,7 +249,7 @@ class MultiWasserstein():
 
         Returns
         -------
-        y_fair : array-like, shape (n_samples,)
+        y_fair : np.ndarray, shape (n_samples,)
             Fair predictions for the test data after enforcing fairness constraints.
 
         Notes
