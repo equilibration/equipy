@@ -1,16 +1,19 @@
+"""Make predictions fair sequentially with respect to all orders of sensitive variables"""
+
 import itertools
 import numpy as np
 
 from ...fairness._wasserstein import MultiWasserstein
+from typing import Optional
 
 
-def permutations_columns(sensitive_features):
+def permutations_columns(sensitive_features: np.ndarray) -> dict[tuple, list]:
     """
     Generate permutations of columns in the input array sensitive_features.
 
     Parameters
     ----------
-    sensitive_features : array-like
+    sensitive_features : np.ndarray, shape (n_samples, n_sensitive_features)
         Input array where each column represents a different sensitive feature.
 
     Returns
@@ -46,22 +49,22 @@ def permutations_columns(sensitive_features):
     return dict_all_combs
 
 
-def calculate_perm_wasserstein(y_calib, sensitive_features_calib, y_test, sensitive_features_test, epsilon=None):
+def calculate_perm_wasserstein(y_calib: np.ndarray, sensitive_features_calib: np.ndarray, y_test: np.ndarray, sensitive_features_test: np.ndarray, epsilon: Optional[list[float]] = None):
     """
     Calculate Wasserstein distance for different permutations of sensitive features between calibration and test sets.
 
     Parameters
     ----------
-    y_calib : array-like
+    y_calib : np.ndarray, shape (n_samples,)
         Calibration set predictions.
-    sensitive_features_calib : array-like
+    sensitive_features_calib : np.ndarray, shape (n_samples, n_sensitive_features)
         Calibration set sensitive features.
-    y_test : array-like
+    y_test : np.ndarray, shape (n_samples,)
         Test set predictions.
-    sensitive_features_test : array-like
+    sensitive_features_test : np.ndarray, shape (n_samples, n_sensitive_features)
         Test set sensitive features.
-    epsilon : array-like or None, optional
-        Fairness constraints. Defaults to None.
+    epsilon : np.ndarray, shape (n_sensitive_features,) or None, default= None
+        Fairness constraints.
 
     Returns
     -------
@@ -86,7 +89,8 @@ def calculate_perm_wasserstein(y_calib, sensitive_features_calib, y_test, sensit
     all_perm_calib = permutations_columns(sensitive_features_calib)
     all_perm_test = permutations_columns(sensitive_features_test)
     if epsilon is not None:
-        all_perm_epsilon = permutations_columns(np.array([np.array(epsilon).T]))
+        all_perm_epsilon = permutations_columns(
+            np.array([np.array(epsilon).T]))
         for key in all_perm_epsilon.keys():
             all_perm_epsilon[key] = all_perm_epsilon[key][0]
 
@@ -104,6 +108,5 @@ def calculate_perm_wasserstein(y_calib, sensitive_features_calib, y_test, sensit
         old_keys = list(store_dict[key].keys())
         new_keys = ['Base model'] + [f'sens_var_{k}' for k in key]
         key_mapping = dict(zip(old_keys, new_keys))
-        store_dict[key] = {key_mapping[old_key]
-            : value for old_key, value in store_dict[key].items()}
+        store_dict[key] = {key_mapping[old_key]                           : value for old_key, value in store_dict[key].items()}
     return store_dict
