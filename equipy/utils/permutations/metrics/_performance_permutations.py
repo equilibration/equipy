@@ -1,12 +1,13 @@
 """Calculation of performance sequentially with respect to all orders of sensitive variables"""
 
 import numpy as np
+from typing import Callable
 from sklearn.metrics import mean_squared_error
 
 from ....metrics._performance_metrics import performance_dict
 
 
-def performance_permutations(y_true: np.ndarray, permut_y_fair_dict: dict[tuple, dict[str, np.ndarray]], metric: function = mean_squared_error) -> list[dict[str, float]]:
+def performance_permutations(y_true: np.ndarray, permut_y_fair_dict: dict[tuple, dict[str, np.ndarray]], metric: Callable = mean_squared_error) -> list[dict[str, float]]:
     """
     Compute the performance values for multiple fair output datasets compared to the true labels, considering permutations.
 
@@ -16,7 +17,7 @@ def performance_permutations(y_true: np.ndarray, permut_y_fair_dict: dict[tuple,
         Actual values.
     permut_y_fair_dict : dict
         A dictionary containing permutations of fair output datasets.
-    metric : function, default = sklearn.metrics.mean_squared_error
+    metric : Callable, default = sklearn.metrics.mean_squared_error
         The metric used to compute the performance, default=sklearn.metrics.mean_square_error.
 
     Returns

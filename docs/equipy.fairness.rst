@@ -4,17 +4,13 @@ equipy.fairness package
 Module contents
 ---------------
 
-.. automodule:: equipy.fairness
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 .. autoclass:: equipy.fairness.FairWasserstein
    :members: fit, transform
+   :exclude-members: modalities_calib, weights, ecdf, eqf
    :undoc-members:
    :show-inheritance:
 
-.. autoclass:: your_module_name.MultiWasserstein
+.. autoclass:: equipy.fairness.MultiWasserstein
    :members: fit, transform
    :undoc-members:
    :show-inheritance:

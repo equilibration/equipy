@@ -85,7 +85,7 @@ class BaseHelper():
                 location_modalities[modality])/len(sensitive_feature)
         return self.weights
 
-    def _estimate_ecdf_eqf(self, y: np.ndarray, sensitive_feature: np.ndarray, sigma: float) -> tuple(dict[str, float], dict[str, float]):
+    def _estimate_ecdf_eqf(self, y: np.ndarray, sensitive_feature: np.ndarray, sigma: float) -> tuple(dict[str, float]):
         """
         Estimate ECDF and EQF for each modality, incorporating random noise within [-sigma, sigma].
 

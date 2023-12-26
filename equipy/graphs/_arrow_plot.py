@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.metrics import mean_squared_error
 import re
-from typing import Optional
+from typing import Optional, Callable
 
 from ..utils.permutations._compute_permutations import permutations_columns, calculate_perm_wasserstein
 from ..utils.permutations.metrics._fairness_permutations import unfairness_permutations
@@ -141,7 +141,7 @@ def fair_multiple_arrow_plot(sensitive_features_calib: np.ndarray,
                              y_test: np.ndarray,
                              y_true_test: np.ndarray,
                              epsilon: Optional[float] = None,
-                             metric: function = mean_squared_error) -> plt.Axes:
+                             metric: Callable = mean_squared_error) -> plt.Axes:
     """
     Plot arrows representing the fairness-performance combinations step by step (by sensitive attribute) to reach fairness for different permutations.
 
@@ -157,10 +157,10 @@ def fair_multiple_arrow_plot(sensitive_features_calib: np.ndarray,
         Predictions for testing.
     y_true_test : numpy.ndarray
         True labels for testing.
-    epsilon : float, optional
-        Epsilon value for calculating Wasserstein distance. Defaults to None.
-    metric : function, optional
-        The metric used to evaluate performance. Defaults to mean_squared_error.
+    epsilon : float, optional, default = None
+        Epsilon value for calculating Wasserstein distance
+    metric : Callable, default = sklearn.mean_squared_error
+        The metric used to evaluate performance.
 
     Returns
     -------
