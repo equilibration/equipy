@@ -90,7 +90,7 @@ Help and Support
 Communication
 ~~~~~~~~~~~~~
 
-Mailing list:
+If you have any inquiries, feel free to contact us:
 
 - François Hu : hu.faugon@gmail.com
 - Suzie Grondin : suzie.grondin@gmail.com
