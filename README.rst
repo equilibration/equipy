@@ -84,8 +84,9 @@ Visualization
 
 This package contains the module **graphs** which allows visualization of the resulting sequential fairness applied to a response variable.
 
-image :: https://github.com/equilibration/equipy/tree/feature-corrections/examples/images/arrow_plot_3_sa.png
-    :alt: (Risk, Unfairness) phase diagram that shows the sequential fairness approach for three sensitive features
+.. image:: https://github.com/equilibration/equipy/tree/feature-corrections/examples/images/arrow_plot_3_sa.png
+  :width: 400
+  :alt: (Risk, Unfairness) phase diagram that shows the sequential fairness approach for three sensitive features
 
 Help and Support
 ----------------
