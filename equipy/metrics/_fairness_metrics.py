@@ -259,7 +259,7 @@ def unfairness_dict(y_fair_dict: dict[str, np.ndarray], sensitive_features: np.n
     {'sensitive_feature_0': 46.0, 'sensitive_feature_1': 28.0, 'sensitive_feature_2': 14.0}
     """
     unfairness_dict = {}
-    for i, y_fair in enumerate(y_fair_dict.values()):
+    for key, y_fair in y_fair_dict.items():
         result = unfairness(y_fair, sensitive_features, n_min)
-        unfairness_dict[f'sensitive_feature_{i}'] = result
+        unfairness_dict[key] = result
     return unfairness_dict

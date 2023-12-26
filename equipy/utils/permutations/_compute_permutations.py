@@ -41,7 +41,7 @@ def permutations_columns(sensitive_features: np.ndarray) -> dict[tuple, list]:
     for permutation in permut_cols:
         permuted_sensitive_features = sensitive_features_with_ind[:, permutation]
 
-        key = tuple(permuted_sensitive_features[0])
+        key = tuple(permuted_sensitive_features[0]+1)
 
         values = permuted_sensitive_features[1:].tolist()
         dict_all_combs[key] = values
