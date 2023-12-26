@@ -62,6 +62,9 @@ def fair_arrow_plot(unfs_dict: dict[str, np.ndarray],
     line = ax.plot(x, y, linestyle="--", alpha=0.25, color="grey")[0]
 
     for i in range(len(sens)):
+        if i > 0:
+            ax.arrow((x[i-1]+x[i])/2, (y[i-1]+y[i])/2, (x[i]-x[i-1])/10,
+                      (y[i]-y[i-1])/10, width = 0.05, color ="grey")
         if (i == 0) & (base_model):
             line.axes.annotate(f"Base\nmodel", xytext=(
                 x[0]+np.min(x)/20, y[0]), xy=(x[0], y[0]), size=10)
@@ -72,7 +75,6 @@ def fair_arrow_plot(unfs_dict: dict[str, np.ndarray],
                 x[i]+np.min(x)/20, y[i]), xy=(x[i], y[i]), size=10)
             ax.scatter(x[i], y[i], label=label, marker="+", s=150)
         elif (i == len(x)-1) & (final_model):
-
             label = f"$A_{1}$" + r"$_:$" + f"$_{i}$-fair"
             line.axes.annotate(label, xytext=(
                 x[i]+np.min(x)/20, y[i]), xy=(x[i], y[i]), size=10)
