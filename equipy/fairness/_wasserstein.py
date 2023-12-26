@@ -27,13 +27,6 @@ class FairWasserstein(BaseHelper):
         Dictionary storing ECDF (Empirical Cumulative Distribution Function) objects for each sensitive modality.
     eqf : dict
         Dictionary storing EQF (Empirical Quantile Function) objects for each sensitive modality.
-
-    Methods
-    -------
-    fit(y, sensitive_feature)
-        Fit the fairness adjustment model using calibration data.
-    transform(y, sensitive_feature, epsilon=0)
-        Transform test data to enforce fairness using Wasserstein distance.
     """
 
     def __init__(self, sigma: float = 0.0001):
