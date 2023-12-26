@@ -155,15 +155,6 @@ class MultiWasserstein():
     eqf_all : dict
         Dictionary storing EQF (Empirical Quantile Function) objects for each sensitive modality
         for all sensitive features.
-
-    Methods
-    -------
-    fit(y, sensitive_features)
-        Fit the multi-sensitive attribute fairness adjustment model using calibration data.
-    transform(y, sensitive_features, epsilon=None)
-        Transform test data to enforce fairness using Wasserstein distance for multiple sensitive attributes.
-    get_sequential_fairness()
-        Get fair predictions for each sensitive feature, applied step by step.
     """
 
     def __init__(self, sigma: float = 0.0001):

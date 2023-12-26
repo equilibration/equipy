@@ -16,21 +16,6 @@ class BaseHelper():
     eqf : dict
         Dictionary storing EQF (Empirical Quantile Function) objects for each sensitive modality.
 
-    Methods
-    -------
-    _get_modalities(sensitive_feature)
-        Get unique modalities from the input sensitive attribute array.
-    _get_location_modalities(sensitive_feature)
-        Get the indices of occurrences for each modality in the input sensitive attribute array.
-    _get_weights(sensitive_feature)
-        Calculate weights (probabilities) for each modality based on their occurrences.
-    _estimate_ecdf_eqf(y, sensitive_feature, sigma)
-        Estimate ECDF and EQF for each modality, incorporating random noise within [-sigma, sigma].
-    _get_correction(self, weights, mod, y_with_noise, location_modalities, modalities_test)
-        Calculate correction of y.
-    _fair_y_values(self, y, modalities_test, location_modalities, weights)
-        Apply fairness correction to input values.
-
     Notes
     -----
     This base class provides essential methods for Wasserstein distance-based fairness adjustment. It includes
