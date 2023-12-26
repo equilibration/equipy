@@ -26,7 +26,7 @@ def permutations_columns(sensitive_features: np.ndarray) -> dict[tuple, list]:
     -------
     >>> sensitive_features = [[1, 2], [3, 4], [5, 6]]
     >>> generate_permutations_cols(sensitive_features)
-    {(0, 1): [[1, 2], [3, 4], [5, 6]], (1, 0): [[3, 4], [1, 2], [5, 6]]}
+    {(1, 2): [[1, 2], [3, 4], [5, 6]], (2, 1): [[3, 4], [1, 2], [5, 6]]}
 
     Note
     ----
@@ -79,7 +79,7 @@ def calculate_perm_wasserstein(y_calib: np.ndarray, sensitive_features_calib: np
     >>> y_test = [4, 5, 6]
     >>> sensitive_features_test = [[7, 8], [9, 10], [11, 12]]
     >>> calculate_perm_wst(y_calib, sensitive_features_calib, y_test, sensitive_features_test)
-    {(0, 1): {'Base model': 0.5, 'sens_var_1': 0.2}, (1, 0): {'Base model': 0.3, 'sens_var_0': 0.6}}
+    {(1,2): {'Base model': 0.5, 'sens_var_1': 0.2, 'sens_var_2': 0}, (2, 1): {'Base model': 0.3, 'sens_var_2': 0.6, 'sens_var_1': 0.6}}
 
     Note
     ----

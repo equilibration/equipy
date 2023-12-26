@@ -29,8 +29,8 @@ def unfairness_permutations(permut_y_fair_dict: dict[tuple, dict[str, np.ndarray
     ...                                (2,1): np.array([[2, 'blue'], [9, 'red'], [5, 'green']])}
     >>> unfs_list = compute_unfairness_permutations(permut_y_fair_dict, all_combs_sensitive_features)
     >>> print(unfs_list)
-    [{'sens_var_0': 46.0, 'sens_var_1': 28.0, 'sens_var_2': 14.0}, 
-     {'sens_var_0': 46.0, 'sens_var_1': 26.0, 'sens_var_2': 14.0}]
+    [{'Base model': 46.0, 'sens_var_1': 28.0, 'sens_var_2': 14.0}, 
+     {'Base modem': 46.0, 'sens_var_1': 26.0, 'sens_var_2': 14.0}]
     """
     unfs_list = []
     for key, value in permut_y_fair_dict.items():
