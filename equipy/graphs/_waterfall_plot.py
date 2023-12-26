@@ -2,6 +2,7 @@
 
 import matplotlib.pyplot as plt
 import numpy as np
+import re
 from typing import Union, Optional
 
 
@@ -184,9 +185,19 @@ def fair_waterfall_plot(unfs_exact: dict[str, np.ndarray], unfs_approx: Optional
 
     fig, ax = plt.subplots()
 
-    handles = []
+    
+    sens = [int(''.join(re.findall(r'\d+', key))) for key in list(unfs_exact.keys())[1:]]
 
-    leg = tuple(unfs_exact.keys()) + ('Final Model',)
+    labels = []
+    for i in range(len(list(unfs_exact.keys())[1:])):
+        if i == 0: 
+            labels.append(f"$A_{sens[i]}$-fair")
+        elif i == len(list(unfs_exact.keys())[1:])-1: 
+            labels.append(f"$A_{1}$" + r"$_:$" + f"$_{sens[i]}$-fair")
+        else:
+            labels.append(f"$A_{{{','.join(map(str, sens[0:i+1]))}}}$-fair")
+
+    leg = ('Base model',) + tuple(labels) + ('Final model',)
     base_exact = list(unfs_exact.values())
     values_exact = [0] + base_exact
     distance_exact = _values_to_distance(values_exact)
@@ -237,9 +248,9 @@ def fair_waterfall_plot(unfs_exact: dict[str, np.ndarray], unfs_approx: Optional
                     if unfs_approx is None else tuple(base_approx), pps, ax)
     _add_doted_points(ax, tuple(base_exact)
                       if unfs_approx is None else tuple(base_approx))
-    ax.set_ylabel(f'Unfairness in $A_{tuple(unfs_exact.keys())[-1]}$')
+    ax.set_ylabel(f'Unfairness in $A_{tuple(unfs_exact.keys())[-1][-1]}$')
     ax.set_ylim(0, 1.1)
     ax.set_title(
-        f'Sequential ({"approximate" if unfs_approx is None else "exact"}) fairness: $A_{tuple(unfs_exact.keys())[-1]}$ result')
+        f'Sequential ({"exact" if unfs_approx is None else "approximate"}) fairness: $A_{tuple(unfs_exact.keys())[-1][-1]}$ result')
     plt.show()
     return ax
