@@ -10,7 +10,7 @@ LONG_DESCRIPTION = long_description
 setup(
         name="equipy", 
         version=VERSION,
-        author="Agathe F, Suzie G, Francois H, Philipp R",
+        author="Agathe F, Suzie G, Francois H, Philipp R, Arthur C",
         author_email="nocontact@email.com",
         description=DESCRIPTION,
         long_description=LONG_DESCRIPTION,

@@ -9,7 +9,9 @@
 **EquiPy** is a Python package implementing sequential fairness on the predicted outputs of Machine Learning models, when dealing with multiple sensitive attributes. This post-processing method progressively achieve fairness accross a set of sensitive features by leveraging multi-marginal Wasserstein barycenters, which extends the standard notion of Strong Demographic Parity to the case with multiple sensitive characteristics. This approach seamlessly extends
 to approximate fairness, enveloping a framework accommodating the trade-off between performance and unfairness.
 
-The project was started in 2023 by François Hu, Philipp Ratz, Suzie Grondin, Agathe Fernandes Machado and Arthur Charpentier, following the release of this paper "A Sequentially Fair Mechanism for Multiple Sensitive Attributes" (https://arxiv.org/pdf/2309.06627.pdf), written by François Hu, Philipp Ratz and Arthur Charpentier.  
+The project was started in 2023 by François Hu, Philipp Ratz, Suzie Grondin, Agathe Fernandes Machado and Arthur Charpentier, following the release of this paper "A Sequentially Fair Mechanism for Multiple Sensitive Attributes" (https://arxiv.org/pdf/2309.06627.pdf), written by François Hu, Philipp Ratz and Arthur Charpentier.
+
+Website : https://equilibration.github.io/equipy/
 
 Installation
 ------------
@@ -36,6 +38,47 @@ To install EquiPy, use ``pip``::
 
     pip install equipy
 
+Project Tree Structure
+------------
+
+The following is the tree structure of the project:
+
+.. code-block:: plaintext
+
+    equipy/
+        ├── equipy/
+        |   ├── __init__.py
+        |   ├── fairness/
+        |   │   ├── __init__.py
+        |   |   ├── _base.py
+        |   |   ├── _wasserstein.py
+        |   ├── graphs/
+        |   │   ├── __init__.py
+        |   │   ├── _arrow_plot.py
+        |   │   ├── _density_plot.py
+        |   │   ├── _waterfall_plot.py
+        |   ├── metrics/
+        |   │   ├── __init__.py
+        |   │   ├── _fairness_metrics.py
+        |   │   ├── _performance_metrics.py
+        |   ├── utils/
+        |   │   ├── __init__.py
+        |   │   ├── checkers.py
+        |   │   ├── permutations/
+        |   │   |   ├── __init__.py
+        |   │   |   ├── _compute_permutations.py
+        |   │   |   ├── metrics/
+        |   │   |   |   ├── __init__.py
+        |   │   |   |   ├── _fairness_permutations.py
+        |   │   |   |   ├── _performance_permutations.py
+        ├── .gitignore
+        ├── LICENSE
+        ├── README.rst
+        ├── requirements.txt
+        ├── setup.py
+        └── tests.py
+
+
 Visualization
 -------------
 
@@ -49,10 +92,10 @@ Communication
 
 Mailing list:
 
-- hu.faugon@gmail.com
-- suzie.grondin@gmail.com
-- ratz.philipp@courrier.uqam.ca
-- fernandes_machado.agathe@courrier.uqam.ca
-- arthur.charpentier@gmail.com
+- François Hu : hu.faugon@gmail.com
+- Suzie Grondin : suzie.grondin@gmail.com
+- Philipp Ratz : ratz.philipp@courrier.uqam.ca
+- Agathe Fernandes Machado : fernandes_machado.agathe@courrier.uqam.ca
+- Arthur Charpentier : arthur.charpentier@gmail.com
 
 
