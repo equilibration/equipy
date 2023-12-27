@@ -88,12 +88,12 @@ This package contains the module **graphs** which allows visualization of the re
 
 .. |pic1| image:: https://raw.githubusercontent.com/equilibration/equipy/feature-corrections/examples/images/arrow_plot_2_sa.png
    :width: 45%
-   :title: mouse over text, hi!
 
 .. |pic2| image:: https://raw.githubusercontent.com/equilibration/equipy/feature-corrections/examples/images/arrow_plot_3_sa.png
    :width: 45%
 
 |pic3| |pic4|
+mouse over text, hi!
 
 .. |pic3| image:: https://raw.githubusercontent.com/equilibration/equipy/feature-corrections/examples/images/waterfall_plot_exact.png
    :width: 45%
