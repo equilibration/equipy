@@ -86,7 +86,8 @@ This package contains the module **graphs** which allows visualization of the re
 
 |pic1| |pic2|
 
-mouse over text, hi!
+(Risk, Unfairness) phase diagrams that shows the sequential fairness approach for (left pane) two sensitive features;
+(right pane) three sensitive features.
 
 .. |pic1| image:: https://raw.githubusercontent.com/equilibration/equipy/feature-corrections/examples/images/arrow_plot_2_sa.png
    :width: 45%
@@ -96,7 +97,7 @@ mouse over text, hi!
 
 |pic3| |pic4|
 
-mouse over text, hi!
+A sequential unfairness evaluation, for (left pane) exact fairness in A_3, (right pane) approximate fairness in A_3 with ε = ε1,2,3 = (0.2, 0.5, 0.75). Hashed color corresponds to exact fairness.
 
 .. |pic3| image:: https://raw.githubusercontent.com/equilibration/equipy/feature-corrections/examples/images/waterfall_plot_exact.png
    :width: 45%
