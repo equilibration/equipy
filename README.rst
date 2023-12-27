@@ -86,7 +86,7 @@ This package contains the module **graphs** which allows visualization of the re
 
 |pic1| |pic2|
 
-(Risk, Unfairness) phase diagrams that shows the sequential fairness approach for (left pane) two sensitive features;
+(Risk, Unfairness) phase diagrams that show the sequential fairness approach for (left pane) two sensitive features;
 (right pane) three sensitive features.
 
 .. |pic1| image:: https://raw.githubusercontent.com/equilibration/equipy/feature-corrections/examples/images/arrow_plot_2_sa.png
