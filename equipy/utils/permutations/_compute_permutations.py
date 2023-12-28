@@ -1,16 +1,19 @@
+"""Make predictions fair sequentially with respect to all orders of sensitive variables"""
+
 import itertools
 import numpy as np
 
 from ...fairness._wasserstein import MultiWasserstein
+from typing import Optional
 
 
-def permutations_columns(sensitive_features):
+def permutations_columns(sensitive_features: np.ndarray) -> dict[tuple, list]:
     """
     Generate permutations of columns in the input array sensitive_features.
 
     Parameters
     ----------
-    sensitive_features : array-like
+    sensitive_features : np.ndarray, shape (n_samples, n_sensitive_features)
         Input array where each column represents a different sensitive feature.
 
     Returns
@@ -23,7 +26,7 @@ def permutations_columns(sensitive_features):
     -------
     >>> sensitive_features = [[1, 2], [3, 4], [5, 6]]
     >>> generate_permutations_cols(sensitive_features)
-    {(0, 1): [[1, 2], [3, 4], [5, 6]], (1, 0): [[3, 4], [1, 2], [5, 6]]}
+    {(1, 2): [[1, 2], [3, 4], [5, 6]], (2, 1): [[3, 4], [1, 2], [5, 6]]}
 
     Note
     ----
@@ -38,7 +41,7 @@ def permutations_columns(sensitive_features):
     for permutation in permut_cols:
         permuted_sensitive_features = sensitive_features_with_ind[:, permutation]
 
-        key = tuple(permuted_sensitive_features[0])
+        key = tuple(permuted_sensitive_features[0]+1)
 
         values = permuted_sensitive_features[1:].tolist()
         dict_all_combs[key] = values
@@ -46,22 +49,22 @@ def permutations_columns(sensitive_features):
     return dict_all_combs
 
 
-def calculate_perm_wasserstein(y_calib, sensitive_features_calib, y_test, sensitive_features_test, epsilon=None):
+def calculate_perm_wasserstein(y_calib: np.ndarray, sensitive_features_calib: np.ndarray, y_test: np.ndarray, sensitive_features_test: np.ndarray, epsilon: Optional[list[float]] = None):
     """
     Calculate Wasserstein distance for different permutations of sensitive features between calibration and test sets.
 
     Parameters
     ----------
-    y_calib : array-like
+    y_calib : np.ndarray, shape (n_samples,)
         Calibration set predictions.
-    sensitive_features_calib : array-like
+    sensitive_features_calib : np.ndarray, shape (n_samples, n_sensitive_features)
         Calibration set sensitive features.
-    y_test : array-like
+    y_test : np.ndarray, shape (n_samples,)
         Test set predictions.
-    sensitive_features_test : array-like
+    sensitive_features_test : np.ndarray, shape (n_samples, n_sensitive_features)
         Test set sensitive features.
-    epsilon : array-like or None, optional
-        Fairness constraints. Defaults to None.
+    epsilon : np.ndarray, shape (n_sensitive_features,) or None, default= None
+        Fairness constraints.
 
     Returns
     -------
@@ -76,7 +79,7 @@ def calculate_perm_wasserstein(y_calib, sensitive_features_calib, y_test, sensit
     >>> y_test = [4, 5, 6]
     >>> sensitive_features_test = [[7, 8], [9, 10], [11, 12]]
     >>> calculate_perm_wst(y_calib, sensitive_features_calib, y_test, sensitive_features_test)
-    {(0, 1): {'Base model': 0.5, 'sens_var_1': 0.2}, (1, 0): {'Base model': 0.3, 'sens_var_0': 0.6}}
+    {(1,2): {'Base model': 0.5, 'sens_var_1': 0.2, 'sens_var_2': 0}, (2, 1): {'Base model': 0.3, 'sens_var_2': 0.6, 'sens_var_1': 0.6}}
 
     Note
     ----
@@ -86,7 +89,8 @@ def calculate_perm_wasserstein(y_calib, sensitive_features_calib, y_test, sensit
     all_perm_calib = permutations_columns(sensitive_features_calib)
     all_perm_test = permutations_columns(sensitive_features_test)
     if epsilon is not None:
-        all_perm_epsilon = permutations_columns(np.array([np.array(epsilon).T]))
+        all_perm_epsilon = permutations_columns(
+            np.array([np.array(epsilon).T]))
         for key in all_perm_epsilon.keys():
             all_perm_epsilon[key] = all_perm_epsilon[key][0]
 
@@ -104,6 +108,5 @@ def calculate_perm_wasserstein(y_calib, sensitive_features_calib, y_test, sensit
         old_keys = list(store_dict[key].keys())
         new_keys = ['Base model'] + [f'sens_var_{k}' for k in key]
         key_mapping = dict(zip(old_keys, new_keys))
-        store_dict[key] = {key_mapping[old_key]
-            : value for old_key, value in store_dict[key].items()}
+        store_dict[key] = {key_mapping[old_key]                           : value for old_key, value in store_dict[key].items()}
     return store_dict

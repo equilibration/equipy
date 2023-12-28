@@ -1,13 +1,16 @@
+"""Check inputs formats."""
+
 import numpy as np
 import warnings
 
-def _check_metric(y):
+
+def _check_metric(y: np.ndarray) -> None:
     """
     Check that it is regression and not classification.
 
     Parameters
     ----------
-    y : array of shape (n_samples,)
+    y : np.ndarray, shape (n_samples,)
         Observed, true values.
 
     Raises
@@ -20,22 +23,35 @@ def _check_metric(y):
             "You used mean squared error as metric but it looks like you are using classification scores")
 
 
-def _check_nb_observations(sensitive_features):
+def _check_nb_observations(sensitive_features: np.ndarray) -> None:
+    """
+    Check that there is more than one observation.
+
+    Parameters
+    ----------
+    sensitive_features : np.ndarray, shape (n_samples, n_sensitive_features)
+        The calibration samples representing multiple sensitive attributes.
+
+    Raises
+    ------
+    ValueError
+        If there is only a single observation
+    """
     if sensitive_features.ndim == 1 & len(sensitive_features) == 1:
-        raise ValueError("Fairness can't be applied on a single observation")
+        raise ValueError("Fairness can not be applied on a single observation")
     if sensitive_features.ndim == 2 & np.shape(sensitive_features)[1] == 1:
-        raise ValueError("Fairness can't be applied on a single observation")
+        raise ValueError("Fairness can not be applied on a single observation")
 
 
-def _check_shape(y, sensitive_feature):
+def _check_shape(y: np.ndarray, sensitive_feature: np.ndarray) -> None:
     """
     Check the shape and data types of input arrays y and sensitive_feature.
 
     Parameters
     ----------
-    y : array-like
+    y :  np.ndarray, shape (n_samples,)
         Target values of the data.
-    sensitive_feature : array-like
+    sensitive_feature : np.ndarray, shape (n_samples,)
         Input samples representing the sensitive attribute.
 
     Raises
@@ -61,7 +77,7 @@ def _check_shape(y, sensitive_feature):
         raise ValueError('y should contain only float or integer numbers')
 
 
-def _check_mod(modalities_calib, modalities_test):
+def _check_mod(modalities_calib: list, modalities_test: list) -> None:
     """
     Check if modalities in test data are included in calibration data's modalities.
 
@@ -83,7 +99,7 @@ def _check_mod(modalities_calib, modalities_test):
             f"The following modalities of the test sensitive features are not in modalities of the calibration sensitive features: {missing_modalities}")
 
 
-def _check_epsilon(epsilon):
+def _check_epsilon(epsilon: float) -> None:
     """
     Check if epsilon (fairness parameter) is within the valid range [0, 1].
 
@@ -102,7 +118,7 @@ def _check_epsilon(epsilon):
             'epsilon must be between 0 and 1')
 
 
-def _check_epsilon_size(epsilon, sensitive_features):
+def _check_epsilon_size(epsilon: list[float], sensitive_features: np.ndarray) -> None:
     """
     Check if the epsilon list matches the number of sensitive features.
 
@@ -111,7 +127,7 @@ def _check_epsilon_size(epsilon, sensitive_features):
     epsilon : list, shape (n_sensitive_features,)
         Fairness parameters controlling the trade-off between fairness and accuracy for each sensitive feature.
 
-    sensitive_features : array-like, shape (n_samples, n_sensitive_features)
+    sensitive_features : np.ndarray, shape (n_samples, n_sensitive_features)
         Test samples representing multiple sensitive attributes.
 
     Raises
