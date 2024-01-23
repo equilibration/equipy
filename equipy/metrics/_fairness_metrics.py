@@ -1,5 +1,9 @@
-"""Computation of the fairness (i.e. measurement of the similarity in prediction distribution between different population groups according to their sensitive attributes)."""
+"""
+Computation of the fairness (i.e. measurement of the similarity in prediction distribution between different population groups according to their sensitive attributes).
+"""
 
+# Authors: Agathe F, Suzie G, Francois H, Philipp R, Arthur C
+# License: BSD 3 clause
 import numpy as np
 import warnings
 from scipy.interpolate import interp1d

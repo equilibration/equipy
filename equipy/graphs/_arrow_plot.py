@@ -1,5 +1,9 @@
-"""Arrow plot of the fairness-performance relationship."""
+"""
+Arrow plot of the fairness-performance relationship.
+"""
 
+# Authors: Agathe F, Suzie G, Francois H, Philipp R, Arthur C
+# License: BSD 3 clause
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.metrics import mean_squared_error
@@ -88,7 +92,8 @@ def fair_arrow_plot(unfs_dict: dict[str, np.ndarray],
         if (i == 0) & (base_model):
             line.axes.annotate(f"Base\nmodel", xytext=(
                 x[0]+np.min(x)/20, y[0]), xy=(x[0], y[0]), size=10)
-            ax.scatter(x[0], y[0], label="Base model", marker="^", s=100)
+            ax.scatter(x[0], y[0], label="Base model", marker="^", 
+                       color="#1f77b4", s=100)
         elif (i == 1) & (first_label_not_used):
             label = f"$A_{sens[i]}$-fair"
             line.axes.annotate(label, xytext=(
@@ -98,7 +103,8 @@ def fair_arrow_plot(unfs_dict: dict[str, np.ndarray],
             label = f"$A_{1}$" + r"$_:$" + f"$_{i}$-fair"
             line.axes.annotate(label, xytext=(
                 x[i]+np.min(x)/20, y[i]), xy=(x[i], y[i]), size=10)
-            ax.scatter(x[i], y[i], label=label, marker="*", s=150)
+            ax.scatter(x[i], y[i], label=label, marker="*", s=150,
+                       color="#d62728")
         elif (i == 2) & (i < len(x)-1) & (double_label_not_used):
             label = f"$A_{sens[1]}$" + r"$_,$" + f"$_{sens[i]}$-fair"
             line.axes.annotate(label, xytext=(

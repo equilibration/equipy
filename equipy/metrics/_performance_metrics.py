@@ -1,5 +1,9 @@
-"""Computation of the performance (i.e. measurement of the similarity between prediction and actual value)."""
+"""
+Computation of the performance (i.e. measurement of the similarity between prediction and actual value).
+"""
 
+# Authors: Agathe F, Suzie G, Francois H, Philipp R, Arthur C
+# License: BSD 3 clause
 import numpy as np
 from typing import Callable
 from sklearn.metrics import mean_squared_error
@@ -15,9 +19,9 @@ def performance(y_true: np.ndarray, y_pred: np.ndarray, metric: Callable = mean_
     y_true : np.ndarray
         Actual values.
     y_pred : np.ndarray
-        Predicted (fair or not) output values.
+        Predicted (fair or not) output values. 
     metric : Callable, (default=mean_squared_error)
-        The metric used to compute the performance, default=sklearn.metrics.mean_square_error.
+        The metric used to compute the performance, which expects y_true then y_pred, default=sklearn.metrics.mean_square_error.
 
     Returns
     -------

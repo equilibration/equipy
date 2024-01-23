@@ -1,5 +1,9 @@
-"""Representation of the probability distribution of predictions as a function of the value of the sensitive attribute. """
+"""
+Representation of the probability distribution of predictions as a function of the value of the sensitive attribute. 
+"""
 
+# Authors: Agathe F, Suzie G, Francois H, Philipp R, Arthur C
+# License: BSD 3 clause
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns

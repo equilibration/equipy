@@ -11,7 +11,7 @@ to approximate fairness, enveloping a framework accommodating the trade-off betw
 
 The project was started in 2023 by François Hu, Philipp Ratz, Suzie Grondin, Agathe Fernandes Machado and Arthur Charpentier, following the release of this paper "A Sequentially Fair Mechanism for Multiple Sensitive Attributes" (https://arxiv.org/pdf/2309.06627.pdf), written by François Hu, Philipp Ratz and Arthur Charpentier.
 
-Website : https://equilibration.github.io/equipy/
+For additional details, you can visit the dedicated **EquiPy** website https://equilibration.github.io/equipy/.
 
 Installation
 ------------

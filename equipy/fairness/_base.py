@@ -1,5 +1,9 @@
-"""Base class containing all necessary calculations to make predictions fair."""
+"""
+Base class containing all necessary calculations to make predictions fair.
+"""
 
+# Authors: Agathe F, Suzie G, Francois H, Philipp R, Arthur C
+# License: BSD 3 clause
 from statsmodels.distributions.empirical_distribution import ECDF
 import numpy as np
 from ..metrics._fairness_metrics import EQF

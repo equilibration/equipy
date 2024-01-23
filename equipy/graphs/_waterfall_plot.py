@@ -1,5 +1,9 @@
-"""Representation of sequential gain in fairness."""
+"""
+Representation of sequential gain in fairness.
+"""
 
+# Authors: Agathe F, Suzie G, Francois H, Philipp R, Arthur C
+# License: BSD 3 clause
 import matplotlib.pyplot as plt
 import numpy as np
 import re

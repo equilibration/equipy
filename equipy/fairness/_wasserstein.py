@@ -1,5 +1,14 @@
-"""Main Classes to make predictions fair."""
+"""
+Main Classes to make predictions fair.
 
+The module structure is as follows:
+
+- The FairWasserstein base Class implements fairness adjustment related to a single sensitive attribute, using Wasserstein distance for both binary classification and regression tasks. In the case of binary classification, this class supports scores instead of classes. For more details, see E. Chzhen, C. Denis, M. Hebiri, L. Oneto and M. Pontil, "Fair Regression with Wasserstein Barycenters" (NeurIPS20).
+- MultiWasserstein Class extends FairWasserstein for multi-sensitive attribute fairness adjustment in a sequential framework. For more details, see F. Hu, P. Ratz, A. Charpentier, "A Sequentially Fair Mechanism for Multiple Sensitive Attributes" (AAAI24).
+"""
+
+# Authors: Agathe F, Suzie G, Francois H, Philipp R, Arthur C
+# License: BSD 3 clause
 import numpy as np
 from ..utils.checkers import _check_epsilon, _check_epsilon_size, _check_mod, _check_shape, _check_nb_observations
 from ._base import BaseHelper
@@ -100,6 +109,10 @@ class FairWasserstein(BaseHelper):
         Random noise within the range of [-sigma, sigma] is added to the test data to ensure fairness.
         The parameter epsilon controls the trade-off between fairness and accuracy,
         with 0 enforcing full fairness and 1 retaining the original predictions.
+
+        References
+        ----------
+        Evgenii Chzhen, Christophe Denis, Mohamed Hebiri, Luca Oneto and Massimiliano Pontil, "Fair Regression with Wasserstein Barycenters" (NeurIPS20)
 
         Examples
         --------
@@ -244,6 +257,10 @@ class MultiWasserstein():
         Random noise within the range of [-sigma, sigma] is added to the test data to ensure fairness.
         The parameter epsilon is a list, where each element controls the trade-off between fairness and accuracy
         for the corresponding sensitive feature.
+
+        References
+        ----------
+        François Hu, Philipp Ratz, Arthur Charpentier, "A Sequentially Fair Mechanism for Multiple Sensitive Attributes" (AAAI24)
 
         Examples
         --------
