@@ -1,19 +1,27 @@
+"""
+Computation of the performance (i.e. measurement of the similarity between prediction and actual value).
+"""
+
+# Authors: Agathe F, Suzie G, Francois H, Philipp R, Arthur C
+# License: BSD 3 clause
+import numpy as np
+from typing import Callable
 from sklearn.metrics import mean_squared_error
 from ..utils.checkers import _check_metric
 
 
-def performance(y_true, y_pred, metric=mean_squared_error):
+def performance(y_true: np.ndarray, y_pred: np.ndarray, metric: Callable = mean_squared_error) -> float:
     """
     Compute the performance value for predicted fair output compared to the true labels.
 
     Parameters
     ----------
-    y_true : array-like
-        True labels or ground truth values.
-    y_pred : array-like
-        Predicted (fair or not) output values.
-    metric : callable, optional
-        The metric used to compute the performance, default=sklearn.metrics.mean_square_error.
+    y_true : np.ndarray
+        Actual values.
+    y_pred : np.ndarray
+        Predicted (fair or not) output values. 
+    metric : Callable, (default=mean_squared_error)
+        The metric used to compute the performance, which expects y_true then y_pred, default=sklearn.metrics.mean_square_error.
 
     Returns
     -------
@@ -40,17 +48,17 @@ def performance(y_true, y_pred, metric=mean_squared_error):
     return metric(y_true, y_pred)
 
 
-def performance_dict(y_true, y_fair_dict, metric=mean_squared_error):
+def performance_dict(y_true: np.ndarray, y_fair_dict: dict[str, np.ndarray], metric: Callable = mean_squared_error) -> dict[str, float]:
     """
     Compute the performance values for multiple fair output datasets compared to the true labels.
 
     Parameters
     ----------
-    y_true : array-like
-        True labels or ground truth values.
+    y_true : np.ndarray
+        Actual values.
     y_fair_dict : dict
         A dictionary containing sequentially fair output datasets.
-    metric : callable, optional
+    metric : Callable, optional
         The metric used to compute the performance, default=sklearn.metrics.mean_square_error.
 
     Returns

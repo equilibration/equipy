@@ -1,7 +1,16 @@
+"""
+Representation of sequential gain in fairness.
+"""
+
+# Authors: Agathe F, Suzie G, Francois H, Philipp R, Arthur C
+# License: BSD 3 clause
 import matplotlib.pyplot as plt
 import numpy as np
+import re
+from typing import Union, Optional
 
-def _set_colors(substraction_list):
+
+def _set_colors(substraction_list: list[float]) -> list[str]:
     """
     Assign colors to bars based on the values in the subtraction_list.
 
@@ -32,7 +41,7 @@ def _set_colors(substraction_list):
     return bar_colors
 
 
-def _add_bar_labels(values, pps, ax):
+def _add_bar_labels(values: list[float], pps: list[plt.bar], ax: plt.Axes) -> plt.Axes:
     """
     Add labels to the top of each bar in a bar plot.
 
@@ -60,9 +69,10 @@ def _add_bar_labels(values, pps, ax):
                     xytext=(0, 3),
                     textcoords="offset points",
                     ha='center', va='bottom')
+    return ax
 
 
-def _add_doted_points(ax, values):
+def _add_doted_points(ax: plt.Axes, values: np.ndarray) -> plt.Axes:
     """
     Add dotted lines at the top of each bar in a bar plot.
 
@@ -80,7 +90,7 @@ def _add_doted_points(ax, values):
         The dotted lines at the top of each bar in a bar plot
 
     This function adds dotted lines at the top of each bar in a bar plot, corresponding to the height values.
-    
+
     Examples
     --------
     >>> import matplotlib.pyplot as plt
@@ -92,25 +102,27 @@ def _add_doted_points(ax, values):
     for i, v in enumerate(values):
         ax.plot([i+0.25, i+1.25], [v, v],
                 linestyle='--', linewidth=1.5, c='grey')
+    return ax
 
 
-def _add_legend(pps, distance, hatch=False):
+def _add_legend(pps: list[plt.bar], distance: Union[np.ndarray, list], hatch: bool = False) -> list[plt.bar]:
     """
-    Add dotted lines at the top of each bar in a bar plot.
+    Add legend labels to the bar plot based on the distances.
 
     Parameters
     ----------
-    ax : matplotlib.axes.Axes
-        The Axes on which the bars are plotted.
-    values : list
-        A list of numerical values representing the heights of the bars.
+    pps : List[plt.bar]
+        List of bar objects.
+    distance : np.ndarray or list
+        Array or list of numerical values representing distances.
+    hatch : bool, optional
+        If True, uses hatching for the legend labels. Defaults to False.
 
     Returns
     -------
-    matplotlib.axes.Axes
-        LineCollection object representing the dotted lines added at the top of each bar in the plot.
+    List[plt.bar]
+        List of bar objects with legend labels added.
     """
-
     used_labels = set()
     for i, bar in enumerate(pps):
         if i == 0 or i == len(pps)-1:
@@ -124,9 +136,10 @@ def _add_legend(pps, distance, hatch=False):
         if label not in used_labels:
             bar.set_label(label)
             used_labels.add(label)
+    return pps
 
 
-def _values_to_distance(values):
+def _values_to_distance(values: list[float]) -> list[float]:
     """
     Convert a list of values to a list of distances between consecutive values.
 
@@ -151,7 +164,7 @@ def _values_to_distance(values):
     return distance
 
 
-def fair_waterfall_plot(unfs_exact, unfs_approx=None):
+def fair_waterfall_plot(unfs_exact: dict[str, np.ndarray], unfs_approx: Optional[dict[str, np.ndarray]] = None) -> plt.Axes:
     """
     Generate a waterfall plot illustrating the sequential fairness in a model.
 
@@ -176,9 +189,19 @@ def fair_waterfall_plot(unfs_exact, unfs_approx=None):
 
     fig, ax = plt.subplots()
 
-    handles = []
+    
+    sens = [int(''.join(re.findall(r'\d+', key))) for key in list(unfs_exact.keys())[1:]]
 
-    leg = tuple(unfs_exact.keys()) + ('Final Model',)
+    labels = []
+    for i in range(len(list(unfs_exact.keys())[1:])):
+        if i == 0: 
+            labels.append(f"$A_{sens[i]}$-fair")
+        elif i == len(list(unfs_exact.keys())[1:])-1: 
+            labels.append(f"$A_{1}$" + r"$_:$" + f"$_{sens[i]}$-fair")
+        else:
+            labels.append(f"$A_{{{','.join(map(str, sens[0:i+1]))}}}$-fair")
+
+    leg = ('Base model',) + tuple(labels) + ('Final model',)
     base_exact = list(unfs_exact.values())
     values_exact = [0] + base_exact
     distance_exact = _values_to_distance(values_exact)
@@ -229,8 +252,9 @@ def fair_waterfall_plot(unfs_exact, unfs_approx=None):
                     if unfs_approx is None else tuple(base_approx), pps, ax)
     _add_doted_points(ax, tuple(base_exact)
                       if unfs_approx is None else tuple(base_approx))
-    ax.set_ylabel(f'Unfairness in $A_{tuple(unfs_exact.keys())[-1]}$')
+    ax.set_ylabel(f'Unfairness in $A_{tuple(unfs_exact.keys())[-1][-1]}$')
     ax.set_ylim(0, 1.1)
     ax.set_title(
-        f'Sequential ({"approximate" if unfs_approx is None else "exact"}) fairness: $A_{tuple(unfs_exact.keys())[-1]}$ result')
+        f'Sequential ({"exact" if unfs_approx is None else "approximate"}) fairness: $A_{tuple(unfs_exact.keys())[-1][-1]}$ result')
     plt.show()
+    return ax

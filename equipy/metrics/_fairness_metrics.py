@@ -1,10 +1,15 @@
-from matplotlib.collections import EventCollection
+"""
+Computation of the fairness (i.e. measurement of the similarity in prediction distribution between different population groups according to their sensitive attributes).
+"""
+
+# Authors: Agathe F, Suzie G, Francois H, Philipp R, Arthur C
+# License: BSD 3 clause
 import numpy as np
-from sklearn.metrics import accuracy_score, mean_squared_error
 import warnings
 from scipy.interpolate import interp1d
 import numpy as np
 import ot
+from typing import Union
 
 # WARNING:You cannot calculate the EQF function of a single value : this means that if only one individual
 # has a specific sensitive value, you cannot use the transform function.
@@ -39,25 +44,17 @@ class EQF:
     __call__(value_)
         Callable method to compute the interpolated value for a given quantile.
 
-    Example usage
-    -------------
-    >>> sample_data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-    >>> eqf = EQF(sample_data)
-    >>> print(eqf(0.5))  # Interpolated value at quantile 0.5
-    5.5
-
-    Example usage
-    -------------
-    >>> sample_data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-    >>> eqf = EQF(sample_data)
-    >>> print(eqf([0.2, 0.5, 0.8]))  # Interpolated value at quantiles 0.2, 0.5, and 0.8
-    [2.8 5.5 8.2]
-
-
     Raises
     ------
     ValueError
         If the input value_ is outside the range [0, 1].
+
+    Example 
+    -------
+    >>> sample_data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    >>> eqf = EQF(sample_data)
+    >>> print(eqf([0.2, 0.5, 0.8]))  # Interpolated value at quantiles 0.2, 0.5, and 0.8
+    [2.8 5.5 8.2]
 
     Note
     ----
@@ -65,14 +62,12 @@ class EQF:
     - The input sample_data should be a list or array-like containing numerical values.
     """
 
-    def __init__(self,
-                 sample_data,
-                 ):
+    def __init__(self, sample_data: Union[np.ndarray, list[float]]):
         self._calculate_eqf(sample_data)
         if len(sample_data) == 1:
             warnings.warn('One of your sample data contains a single value')
 
-    def _calculate_eqf(self, sample_data):
+    def _calculate_eqf(self, sample_data: Union[np.ndarray, list[float]]) -> None:
         """
         Calculate the Empirical Quantile Function for the given sample data.
 
@@ -105,7 +100,7 @@ class EQF:
         self.min_val = sorted_data[0]
         self.max_val = sorted_data[-1]
 
-    def __call__(self, value_):
+    def __call__(self, value_: float) -> float:
         """
         Compute the interpolated value for a given quantile.
 
@@ -140,7 +135,7 @@ class EQF:
                 raise ValueError('Error with input value')
 
 
-def diff_quantile(data1, data2, n_min=1000):
+def diff_quantile(data1: np.ndarray, data2: np.ndarray, n_min: float = 1000) -> float:
     """
     Compute the unfairness between two populations based on their quantile functions. 
     If the number of points in data1 is less than n_min, compute the Wasserstein distance using the POT package. 
@@ -148,9 +143,9 @@ def diff_quantile(data1, data2, n_min=1000):
 
     Parameters
     ----------
-    data1 : array-like
+    data1 : np.ndarray
         The first set of data points.
-    data2 : array-like
+    data2 : np.ndarray
         The second set of data points.
     n_min : float
         Below this threshold, compute the Wasserstein distance.
@@ -189,7 +184,7 @@ def diff_quantile(data1, data2, n_min=1000):
     return unfair_value
 
 
-def unfairness(y, sensitive_features, n_min=1000):
+def unfairness(y: np.ndarray, sensitive_features: np.ndarray, n_min: float = 1000) -> float:
     """
     Compute the unfairness value for a given fair output (y) and multiple sensitive attributes data (sensitive_features) containing several modalities.
     If there is a single sensitive feature, it calculates the maximum quantile difference between different modalities of that single sensitive feature.
@@ -198,9 +193,9 @@ def unfairness(y, sensitive_features, n_min=1000):
 
     Parameters
     ----------
-    y : array-like
+    y : np.ndarray
         Predicted (fair or not) output data.
-    sensitive_features : array-like
+    sensitive_features : np.ndarray
         Sensitive attribute data.
     n_min : float
         Below this threshold, compute the unfairness based on the Wasserstein distance.
@@ -237,7 +232,7 @@ def unfairness(y, sensitive_features, n_min=1000):
     return max(new_list)
 
 
-def unfairness_dict(y_fair_dict, sensitive_features, n_min=1000):
+def unfairness_dict(y_fair_dict: dict[str, np.ndarray], sensitive_features: np.ndarray, n_min: float = 1000) -> dict[str, float]:
     """
     Compute unfairness values for sequentially fair output datasets and multiple sensitive attributes datasets.
 
@@ -268,7 +263,7 @@ def unfairness_dict(y_fair_dict, sensitive_features, n_min=1000):
     {'sensitive_feature_0': 46.0, 'sensitive_feature_1': 28.0, 'sensitive_feature_2': 14.0}
     """
     unfairness_dict = {}
-    for i, y_fair in enumerate(y_fair_dict.values()):
+    for key, y_fair in y_fair_dict.items():
         result = unfairness(y_fair, sensitive_features, n_min)
-        unfairness_dict[f'sensitive_feature_{i}'] = result
+        unfairness_dict[key] = result
     return unfairness_dict

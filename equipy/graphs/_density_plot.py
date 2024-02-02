@@ -1,9 +1,16 @@
+"""
+Representation of the probability distribution of predictions as a function of the value of the sensitive attribute. 
+"""
+
+# Authors: Agathe F, Suzie G, Francois H, Philipp R, Arthur C
+# License: BSD 3 clause
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+import numpy as np
 
 
-def fair_density_plot(y, sensitive_features):
+def fair_density_plot(y: dict[str, np.ndarray], sensitive_features: np.ndarray) -> plt.Axes:
     """
     Visualizes the distribution of predictions based on different sensitive features using kernel density estimates (KDE).
 
@@ -16,17 +23,13 @@ def fair_density_plot(y, sensitive_features):
 
     Returns
     -------
-    matplotlib.figure.Figure
-        the density function for predictions based on different sensitive features and fairness.
+    matplotlib.axes.Axes
+        The density function for predictions based on different sensitive features and fairness.
 
     Raises
     ------
     ValueError
         If the input data is not in the expected format.
-
-    Plotting Conventions
-    --------------------
-    - The x-axis represents prediction values, and the y-axis represents density.
 
     Example
     -------
@@ -37,10 +40,6 @@ def fair_density_plot(y, sensitive_features):
             ...
         }
     >>> sensitive_features = [[sensitive_features_of_ind_1_values], [sensitive_feature_of_ind_2_values], ...]
-
-    Usage
-    -----
-    fairness_density_plot(y, sensitive_features)
     """
 
     fig, axes = plt.subplots(nrows=len(sensitive_features.T), ncols=len(
@@ -70,3 +69,4 @@ def fair_density_plot(y, sensitive_features):
             axes[graph].xaxis.set_tick_params(labelsize=20)
             axes[graph].yaxis.set_tick_params(labelsize=20)
             graph += 1
+    return axes

@@ -11,8 +11,8 @@ import sys
 sys.path.insert(0, os.path.abspath("../"))
 
 project = 'EquiPy'
-copyright = '2023, Agathe F, Suzie G, Francois H, Philipp R'
-author = 'Agathe F, Suzie G, Francois H, Philipp R'
+copyright = '2023, Agathe F, Suzie G, Francois H, Philipp R, Arthur C'
+author = 'Agathe F, Suzie G, Francois H, Philipp R, Arthur C'
 release = '0.0.3'
 
 # -- General configuration ---------------------------------------------------
