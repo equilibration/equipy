@@ -3,7 +3,7 @@
 |Build yes|
 
 .. |Build yes| image:: https://img.shields.io/badge/build-passing-<COLOR>.svg
-   :target: https://github.com/a19ferna/equipy/actions/workflows/build-package.yml
+   :target: https://github.com/equilibration/equipy/actions/workflows/build-package.yml
 
 
 **EquiPy** is a Python package implementing sequential fairness on the predicted outputs of Machine Learning models, when dealing with multiple sensitive attributes. This post-processing method progressively achieve fairness accross a set of sensitive features by leveraging multi-marginal Wasserstein barycenters, which extends the standard notion of Strong Demographic Parity to the case with multiple sensitive characteristics. This approach seamlessly extends
@@ -39,7 +39,7 @@ To install EquiPy, use ``pip``::
     pip install equipy
 
 Project Tree Structure
-------------
+----------------------
 
 The following is the tree structure of the project:
 
