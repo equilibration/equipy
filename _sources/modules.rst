@@ -5,5 +5,3 @@ equipy
    :maxdepth: 4
 
    equipy
-   setup
-   tests

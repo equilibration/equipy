@@ -137,14 +137,8 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../equipy.fairness.html">equipy.fairness package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../equipy.graphs.html">equipy.graphs package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../equipy.metrics.html">equipy.metrics package</a></li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../equipy.utils.html">equipy.utils package</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../../equipy.utils.permutations.html">equipy.utils.permutations package</a></li>
 </ul>
 </li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../../../setup.html">setup module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../tests.html">tests module</a></li>
 </ul>
 </li>
 </ul>
@@ -250,11 +244,24 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for equipy.fairness._wasserstein</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">..utils.checkers</span> <span class="kn">import</span> <span class="n">_check_epsilon</span><span class="p">,</span> <span class="n">_check_epsilon_size</span><span class="p">,</span> <span class="n">_check_mod</span><span class="p">,</span> <span class="n">_check_shape</span><span class="p">,</span> <span class="n">_check_nb_observations</span>
-<span class="kn">from</span>  <span class="nn">._base</span> <span class="kn">import</span> <span class="n">BaseHelper</span>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Main Classes to make predictions fair.</span>
 
-<span class="k">class</span> <span class="nc">FairWasserstein</span><span class="p">(</span><span class="n">BaseHelper</span><span class="p">):</span>
+<span class="sd">The module structure is as follows:</span>
+
+<span class="sd">- The FairWasserstein base Class implements fairness adjustment related to a single sensitive attribute, using Wasserstein distance for both binary classification and regression tasks. In the case of binary classification, this class supports scores instead of classes. For more details, see E. Chzhen, C. Denis, M. Hebiri, L. Oneto and M. Pontil, &quot;Fair Regression with Wasserstein Barycenters&quot; (NeurIPS20).</span>
+<span class="sd">- MultiWasserstein Class extends FairWasserstein for multi-sensitive attribute fairness adjustment in a sequential framework. For more details, see F. Hu, P. Ratz, A. Charpentier, &quot;A Sequentially Fair Mechanism for Multiple Sensitive Attributes&quot; (AAAI24).</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c1"># Authors: Agathe F, Suzie G, Francois H, Philipp R, Arthur C</span>
+<span class="c1"># License: BSD 3 clause</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">..utils.checkers</span> <span class="kn">import</span> <span class="n">_check_epsilon</span><span class="p">,</span> <span class="n">_check_epsilon_size</span><span class="p">,</span> <span class="n">_check_mod</span><span class="p">,</span> <span class="n">_check_shape</span><span class="p">,</span> <span class="n">_check_nb_observations</span>
+<span class="kn">from</span> <span class="nn">._base</span> <span class="kn">import</span> <span class="n">BaseHelper</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span>
+
+
+<div class="viewcode-block" id="FairWasserstein"><a class="viewcode-back" href="../../../equipy.fairness.html#equipy.fairness.FairWasserstein">[docs]</a><span class="k">class</span> <span class="nc">FairWasserstein</span><span class="p">(</span><span class="n">BaseHelper</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Class implementing Wasserstein distance-based fairness adjustment for binary classification tasks.</span>
 
@@ -275,30 +282,23 @@ document.write(`
 <span class="sd">        Dictionary storing ECDF (Empirical Cumulative Distribution Function) objects for each sensitive modality.</span>
 <span class="sd">    eqf : dict</span>
 <span class="sd">        Dictionary storing EQF (Empirical Quantile Function) objects for each sensitive modality.</span>
-
-<span class="sd">    Methods</span>
-<span class="sd">    -------</span>
-<span class="sd">    fit(y, sensitive_feature)</span>
-<span class="sd">        Fit the fairness adjustment model using calibration data.</span>
-<span class="sd">    transform(y, sensitive_feature, epsilon=0)</span>
-<span class="sd">        Transform test data to enforce fairness using Wasserstein distance.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">0.0001</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sigma</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0001</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sigma</span> <span class="o">=</span> <span class="n">sigma</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">modalities_calib</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sensitive_feature</span><span class="p">):</span>
+<div class="viewcode-block" id="FairWasserstein.fit"><a class="viewcode-back" href="../../../equipy.fairness.html#equipy.fairness.FairWasserstein.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">sensitive_feature</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Perform fit on the calibration data and save the ECDF, EQF, and weights of the sensitive variable.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        y : array-like, shape (n_samples,)</span>
+<span class="sd">        y : np.ndarray, shape (n_samples,)</span>
 <span class="sd">            The calibration labels.</span>
 
-<span class="sd">        sensitive_feature : array-like, shape (n_samples,)</span>
+<span class="sd">        sensitive_feature : np.ndarray, shape (n_samples,)</span>
 <span class="sd">            The calibration samples representing one single sensitive attribute.</span>
 
 <span class="sd">        Returns</span>
@@ -323,18 +323,18 @@ document.write(`
 
         <span class="bp">self</span><span class="o">.</span><span class="n">modalities_calib</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_modalities</span><span class="p">(</span><span class="n">sensitive_feature</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_compute_weights</span><span class="p">(</span><span class="n">sensitive_feature</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_estimate_ecdf_eqf</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">sensitive_feature</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sigma</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_estimate_ecdf_eqf</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">sensitive_feature</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sigma</span><span class="p">)</span></div>
 
-    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sensitive_feature</span><span class="p">,</span> <span class="n">epsilon</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<div class="viewcode-block" id="FairWasserstein.transform"><a class="viewcode-back" href="../../../equipy.fairness.html#equipy.fairness.FairWasserstein.transform">[docs]</a>    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">sensitive_feature</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Transform the test data to enforce fairness using Wasserstein distance.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        y : array-like, shape (n_samples,)</span>
+<span class="sd">        y : np.ndarray, shape (n_samples,)</span>
 <span class="sd">            The target values of the test data.</span>
 
-<span class="sd">        sensitive_feature : array-like, shape (n_samples,)</span>
+<span class="sd">        sensitive_feature : np.ndarray, shape (n_samples,)</span>
 <span class="sd">            The test samples representing a single sensitive attribute.</span>
 
 <span class="sd">        epsilon : float, optional (default=0)</span>
@@ -344,7 +344,7 @@ document.write(`
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        y_fair : array-like, shape (n_samples,)</span>
+<span class="sd">        y_fair : np.ndarray, shape (n_samples,)</span>
 <span class="sd">            Fair predictions for the test data after enforcing fairness constraints.</span>
 
 <span class="sd">        Notes</span>
@@ -355,6 +355,10 @@ document.write(`
 <span class="sd">        Random noise within the range of [-sigma, sigma] is added to the test data to ensure fairness.</span>
 <span class="sd">        The parameter epsilon controls the trade-off between fairness and accuracy,</span>
 <span class="sd">        with 0 enforcing full fairness and 1 retaining the original predictions.</span>
+
+<span class="sd">        References</span>
+<span class="sd">        ----------</span>
+<span class="sd">        Evgenii Chzhen, Christophe Denis, Mohamed Hebiri, Luca Oneto and Massimiliano Pontil, &quot;Fair Regression with Wasserstein Barycenters&quot; (NeurIPS20)</span>
 
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
@@ -374,8 +378,8 @@ document.write(`
         <span class="n">_check_mod</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">modalities_calib</span><span class="p">,</span> <span class="n">modalities_test</span><span class="p">)</span>
 
         <span class="n">y_fair</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fair_y_values</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">sensitive_feature</span><span class="p">,</span> <span class="n">modalities_test</span><span class="p">)</span>
-        <span class="k">return</span> <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">epsilon</span><span class="p">)</span><span class="o">*</span><span class="n">y_fair</span> <span class="o">+</span> <span class="n">epsilon</span><span class="o">*</span><span class="n">y</span>
-<span class="s2">&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">epsilon</span><span class="p">)</span><span class="o">*</span><span class="n">y_fair</span> <span class="o">+</span> <span class="n">epsilon</span><span class="o">*</span><span class="n">y</span></div></div>
+
 
 <div class="viewcode-block" id="MultiWasserstein"><a class="viewcode-back" href="../../../equipy.fairness.html#equipy.fairness.MultiWasserstein">[docs]</a><span class="k">class</span> <span class="nc">MultiWasserstein</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -403,18 +407,9 @@ document.write(`
 <span class="sd">    eqf_all : dict</span>
 <span class="sd">        Dictionary storing EQF (Empirical Quantile Function) objects for each sensitive modality</span>
 <span class="sd">        for all sensitive features.</span>
-
-<span class="sd">    Methods</span>
-<span class="sd">    -------</span>
-<span class="sd">    fit(y, sensitive_features)</span>
-<span class="sd">        Fit the multi-sensitive attribute fairness adjustment model using calibration data.</span>
-<span class="sd">    transform(y, sensitive_features, epsilon=None)</span>
-<span class="sd">        Transform test data to enforce fairness using Wasserstein distance for multiple sensitive attributes.</span>
-<span class="sd">    get_sequential_fairness()</span>
-<span class="sd">        Get fair predictions for each sensitive feature, applied step by step.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">0.0001</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sigma</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0001</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialize the MultiWasserStein instance.</span>
 
@@ -438,17 +433,16 @@ document.write(`
 
         <span class="bp">self</span><span class="o">.</span><span class="n">sigma</span> <span class="o">=</span> <span class="n">sigma</span>
 
-
-<div class="viewcode-block" id="MultiWasserstein.fit"><a class="viewcode-back" href="../../../equipy.fairness.html#equipy.fairness.MultiWasserstein.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sensitive_features</span><span class="p">):</span>
+<div class="viewcode-block" id="MultiWasserstein.fit"><a class="viewcode-back" href="../../../equipy.fairness.html#equipy.fairness.MultiWasserstein.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">sensitive_features</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Perform fit on the calibration data and save the ECDF, EQF, and weights for each sensitive variable.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        y : array-like, shape (n_samples,)</span>
+<span class="sd">        y : np.ndarray, shape (n_samples,)</span>
 <span class="sd">            The calibration labels.</span>
 
-<span class="sd">        sensitive_features : array-like, shape (n_samples, n_sensitive_features)</span>
+<span class="sd">        sensitive_features : np.ndarray, shape (n_samples, n_sensitive_features)</span>
 <span class="sd">            The calibration samples representing multiple sensitive attributes.</span>
 
 <span class="sd">        Returns</span>
@@ -465,13 +459,14 @@ document.write(`
         <span class="n">_check_nb_observations</span><span class="p">(</span><span class="n">sensitive_features</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">sensitive_features</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="n">sensitive_features</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">sensitive_features</span><span class="p">,</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sensitive_features</span><span class="p">),</span><span class="mi">1</span><span class="p">))</span>
+            <span class="n">sensitive_features</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span>
+                <span class="n">sensitive_features</span><span class="p">,</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sensitive_features</span><span class="p">),</span> <span class="mi">1</span><span class="p">))</span>
 
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">sens</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">sensitive_features</span><span class="o">.</span><span class="n">T</span><span class="p">):</span>
             <span class="n">wasserstein_instance</span> <span class="o">=</span> <span class="n">FairWasserstein</span><span class="p">(</span><span class="n">sigma</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sigma</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="n">y_inter</span> <span class="o">=</span> <span class="n">y</span>
-            
+
             <span class="n">wasserstein_instance</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">y_inter</span><span class="p">,</span> <span class="n">sens</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">modalities_calib_all</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;sensitive_feature_</span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">wasserstein_instance</span><span class="o">.</span><span class="n">modalities_calib</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">weights_all</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;sensitive_feature_</span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">wasserstein_instance</span><span class="o">.</span><span class="n">weights</span>
@@ -479,16 +474,16 @@ document.write(`
             <span class="bp">self</span><span class="o">.</span><span class="n">ecdf_all</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;sensitive_feature_</span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">wasserstein_instance</span><span class="o">.</span><span class="n">ecdf</span>
             <span class="n">y_inter</span> <span class="o">=</span> <span class="n">wasserstein_instance</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">y_inter</span><span class="p">,</span> <span class="n">sens</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="MultiWasserstein.transform"><a class="viewcode-back" href="../../../equipy.fairness.html#equipy.fairness.MultiWasserstein.transform">[docs]</a>    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sensitive_features</span><span class="p">,</span> <span class="n">epsilon</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="MultiWasserstein.transform"><a class="viewcode-back" href="../../../equipy.fairness.html#equipy.fairness.MultiWasserstein.transform">[docs]</a>    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">sensitive_features</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Transform the test data to enforce fairness using Wasserstein distance.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        y : array-like, shape (n_samples,)</span>
+<span class="sd">        y : np.ndarray, shape (n_samples,)</span>
 <span class="sd">            The target values of the test data.</span>
 
-<span class="sd">        sensitive_features : array-like, shape (n_samples, n_sensitive_features)</span>
+<span class="sd">        sensitive_features : np.ndarray shape (n_samples, n_sensitive_features)</span>
 <span class="sd">            The test samples representing multiple sensitive attributes.</span>
 
 <span class="sd">        epsilon : list, shape (n_sensitive_features,), optional (default=None)</span>
@@ -497,7 +492,7 @@ document.write(`
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        y_fair : array-like, shape (n_samples,)</span>
+<span class="sd">        y_fair : np.ndarray, shape (n_samples,)</span>
 <span class="sd">            Fair predictions for the test data after enforcing fairness constraints.</span>
 
 <span class="sd">        Notes</span>
@@ -508,6 +503,10 @@ document.write(`
 <span class="sd">        Random noise within the range of [-sigma, sigma] is added to the test data to ensure fairness.</span>
 <span class="sd">        The parameter epsilon is a list, where each element controls the trade-off between fairness and accuracy</span>
 <span class="sd">        for the corresponding sensitive feature.</span>
+
+<span class="sd">        References</span>
+<span class="sd">        ----------</span>
+<span class="sd">        François Hu, Philipp Ratz, Arthur Charpentier, &quot;A Sequentially Fair Mechanism for Multiple Sensitive Attributes&quot; (AAAI24)</span>
 
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
@@ -572,7 +571,7 @@ document.write(`
   <div class="footer-item">
     
 <p class="component-author">
-By Agathe F, Suzie G, Francois H, Philipp R
+By Agathe F, Suzie G, Francois H, Philipp R, Arthur C
 </p>
 
   </div>
@@ -582,7 +581,7 @@ By Agathe F, Suzie G, Francois H, Philipp R
 
   <p class="copyright">
     
-      © Copyright 2023, Agathe F, Suzie G, Francois H, Philipp R.
+      © Copyright 2023, Agathe F, Suzie G, Francois H, Philipp R, Arthur C.
       <br/>
     
   </p>

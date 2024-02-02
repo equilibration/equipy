@@ -140,14 +140,8 @@
 <li class="toctree-l3"><a class="reference internal" href="equipy.fairness.html">equipy.fairness package</a></li>
 <li class="toctree-l3 current active"><a class="current reference internal" href="#">equipy.graphs package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="equipy.metrics.html">equipy.metrics package</a></li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="equipy.utils.html">equipy.utils package</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l4"><a class="reference internal" href="equipy.utils.permutations.html">equipy.utils.permutations package</a></li>
 </ul>
 </li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="setup.html">setup module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tests.html">tests module</a></li>
 </ul>
 </li>
 </ul>
@@ -298,7 +292,7 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-equipy.graphs">Module contents</a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-contents">Module contents</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#equipy.graphs.fair_arrow_plot"><code class="docutils literal notranslate"><span class="pre">fair_arrow_plot()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#equipy.graphs.fair_density_plot"><code class="docutils literal notranslate"><span class="pre">fair_density_plot()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#equipy.graphs.fair_multiple_arrow_plot"><code class="docutils literal notranslate"><span class="pre">fair_multiple_arrow_plot()</span></code></a></li>
@@ -318,11 +312,17 @@ document.write(`
                   
   <section id="equipy-graphs-package">
 <h1>equipy.graphs package<a class="headerlink" href="#equipy-graphs-package" title="Permalink to this heading">#</a></h1>
-<section id="module-equipy.graphs">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-equipy.graphs" title="Permalink to this heading">#</a></h2>
-<dl class="py function">
+<section id="module-contents">
+<h2>Module contents<a class="headerlink" href="#module-contents" title="Permalink to this heading">#</a></h2>
+<p>The module enables the visualization of fairness achievement through the presentation of various graphs:</p>
+<ul class="simple">
+<li><p>Representation of the probability distribution of predictions as a function of the value of the sensitive attribute.</p></li>
+<li><p>Arrow plot of the fairness-performance relationship.</p></li>
+<li><p>Representation of sequential gain in fairness using waterfall plots.</p></li>
+</ul>
+<span class="target" id="module-equipy.graphs"></span><dl class="py function">
 <dt class="sig sig-object py" id="equipy.graphs.fair_arrow_plot">
-<span class="sig-prename descclassname"><span class="pre">equipy.graphs.</span></span><span class="sig-name descname"><span class="pre">fair_arrow_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">unfs_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">performance_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">permutations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">final_model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/equipy/graphs/_arrow_plot.html#fair_arrow_plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#equipy.graphs.fair_arrow_plot" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">equipy.graphs.</span></span><span class="sig-name descname"><span class="pre">fair_arrow_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">unfs_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">performance_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">permutations</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">final_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Axes</span></span></span><a class="reference internal" href="_modules/equipy/graphs/_arrow_plot.html#fair_arrow_plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#equipy.graphs.fair_arrow_plot" title="Permalink to this definition">#</a></dt>
 <dd><p>Generates an arrow plot representing the fairness-performance combinations step by step (by sensitive attribute) to reach fairness.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -335,14 +335,10 @@ document.write(`
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><ul class="simple">
-<li><p><em>matplotlib.figure.Figure</em> – arrows representing the fairness-performance combinations step by step (by sensitive attribute) to reach fairness.</p></li>
-<li><p><em>Plotting Conventions</em></p></li>
-<li><p><em>——————–</em></p></li>
-<li><p><em>- Arrows represent different fairness-performance combinations.</em></p></li>
-<li><p><em>- Axes are labeled for unfairness (x-axis) and performance (y-axis).</em></p></li>
-</ul>
-</p>
+<dd class="field-even"><p>arrows representing the fairness-performance combinations step by step (by sensitive attribute) to reach fairness.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>matplotlib.axes.Axes</p>
 </dd>
 </dl>
 <div class="admonition note">
@@ -355,7 +351,7 @@ document.write(`
 
 <dl class="py function">
 <dt class="sig sig-object py" id="equipy.graphs.fair_density_plot">
-<span class="sig-prename descclassname"><span class="pre">equipy.graphs.</span></span><span class="sig-name descname"><span class="pre">fair_density_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sensitive_features</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/equipy/graphs/_density_plot.html#fair_density_plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#equipy.graphs.fair_density_plot" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">equipy.graphs.</span></span><span class="sig-name descname"><span class="pre">fair_density_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sensitive_features</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Axes</span></span></span><a class="reference internal" href="_modules/equipy/graphs/_density_plot.html#fair_density_plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#equipy.graphs.fair_density_plot" title="Permalink to this definition">#</a></dt>
 <dd><p>Visualizes the distribution of predictions based on different sensitive features using kernel density estimates (KDE).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -365,18 +361,13 @@ document.write(`
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>the density function for predictions based on different sensitive features and fairness.</p>
+<dd class="field-even"><p>The density function for predictions based on different sensitive features and fairness.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>matplotlib.figure.Figure</p>
+<dd class="field-odd"><p>matplotlib.axes.Axes</p>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><strong>ValueError</strong> – If the input data is not in the expected format.</p></li>
-<li><p><strong>Plotting Conventions</strong> – </p></li>
-<li><p><strong>--------------------</strong> – </p></li>
-<li><p><strong>- The x-axis represents prediction values</strong><strong>, </strong><strong>and the y-axis represents density.</strong> – </p></li>
-</ul>
+<dd class="field-even"><p><strong>ValueError</strong> – If the input data is not in the expected format.</p>
 </dd>
 </dl>
 <p class="rubric">Example</p>
@@ -389,15 +380,11 @@ document.write(`
 <span class="gp">&gt;&gt;&gt; </span><span class="n">sensitive_features</span> <span class="o">=</span> <span class="p">[[</span><span class="n">sensitive_features_of_ind_1_values</span><span class="p">],</span> <span class="p">[</span><span class="n">sensitive_feature_of_ind_2_values</span><span class="p">],</span> <span class="o">...</span><span class="p">]</span>
 </pre></div>
 </div>
-<section id="usage">
-<h3>Usage<a class="headerlink" href="#usage" title="Permalink to this heading">#</a></h3>
-<p>fairness_density_plot(y, sensitive_features)</p>
-</section>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="equipy.graphs.fair_multiple_arrow_plot">
-<span class="sig-prename descclassname"><span class="pre">equipy.graphs.</span></span><span class="sig-name descname"><span class="pre">fair_multiple_arrow_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sensitive_features_calib</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sensitive_features_test</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_calib</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_test</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_true_test</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test_size=0.3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">permutation=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metric=&lt;function</span> <span class="pre">mean_squared_error&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/equipy/graphs/_arrow_plot.html#fair_multiple_arrow_plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#equipy.graphs.fair_multiple_arrow_plot" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">equipy.graphs.</span></span><span class="sig-name descname"><span class="pre">fair_multiple_arrow_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sensitive_features_calib:</span> <span class="pre">~numpy.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sensitive_features_test:</span> <span class="pre">~numpy.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_calib:</span> <span class="pre">~numpy.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_test:</span> <span class="pre">~numpy.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_true_test:</span> <span class="pre">~numpy.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon:</span> <span class="pre">float</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metric:</span> <span class="pre">~typing.Callable</span> <span class="pre">=</span> <span class="pre">&lt;function</span> <span class="pre">mean_squared_error&gt;</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Axes</span></span></span><a class="reference internal" href="_modules/equipy/graphs/_arrow_plot.html#fair_multiple_arrow_plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#equipy.graphs.fair_multiple_arrow_plot" title="Permalink to this definition">#</a></dt>
 <dd><p>Plot arrows representing the fairness-performance combinations step by step (by sensitive attribute) to reach fairness for different permutations.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -407,24 +394,15 @@ document.write(`
 <li><p><strong>y_calib</strong> (<em>numpy.ndarray</em>) – Predictions for calibration.</p></li>
 <li><p><strong>y_test</strong> (<em>numpy.ndarray</em>) – Predictions for testing.</p></li>
 <li><p><strong>y_true_test</strong> (<em>numpy.ndarray</em>) – True labels for testing.</p></li>
-<li><p><strong>epsilon</strong> (<em>float</em><em>, </em><em>optional</em>) – Epsilon value for calculating Wasserstein distance. Defaults to None.</p></li>
-<li><p><strong>test_size</strong> (<em>float</em><em>, </em><em>optional</em>) – Size of the testing set. Defaults to 0.3.</p></li>
-<li><p><strong>permutation</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, displays permutations of arrows based on input dictionaries. Defaults to True.</p></li>
-<li><p><strong>metric</strong> (<em>function</em><em>, </em><em>optional</em>) – The metric used to evaluate performance. Defaults to mean_squared_error.</p></li>
+<li><p><strong>epsilon</strong> (<em>float</em><em>, </em><em>optional</em><em>, </em><em>default = None</em>) – Epsilon value for calculating Wasserstein distance</p></li>
+<li><p><strong>metric</strong> (<em>Callable</em><em>, </em><em>default = sklearn.mean_squared_error</em>) – The metric used to evaluate performance.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><ul class="simple">
-<li><p><em>matplotlib.axes.Axes</em> – Arrows representing the fairness-performance combinations step by step (by sensitive attribute) to reach fairness for different permutations.</p></li>
-<li><p><em>Plotting Conventions</em></p></li>
-<li><p><em>——————–</em></p></li>
-<li><p><em>- Arrows represent different fairness-performance combinations for each permutation.</em></p></li>
-<li><p><em>- Axes are labeled for unfairness (x-axis) and performance (y-axis).</em></p></li>
-<li><p><em>Example Usage</em></p></li>
-<li><p><em>————-</em></p></li>
-<li><p><em>&gt;&gt;&gt; custom_fair_arrow_plot(sensitive_features_calib, sensitive_features_test, y_calib, y_test, y_true_test)</em></p></li>
-</ul>
-</p>
+<dd class="field-even"><p>Arrows representing the fairness-performance combinations step by step (by sensitive attribute) to reach fairness for different permutations.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>matplotlib.axes.Axes</p>
 </dd>
 </dl>
 <div class="admonition note">
@@ -435,7 +413,7 @@ document.write(`
 
 <dl class="py function">
 <dt class="sig sig-object py" id="equipy.graphs.fair_waterfall_plot">
-<span class="sig-prename descclassname"><span class="pre">equipy.graphs.</span></span><span class="sig-name descname"><span class="pre">fair_waterfall_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">unfs_exact</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unfs_approx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/equipy/graphs/_waterfall_plot.html#fair_waterfall_plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#equipy.graphs.fair_waterfall_plot" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">equipy.graphs.</span></span><span class="sig-name descname"><span class="pre">fair_waterfall_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">unfs_exact</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unfs_approx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Axes</span></span></span><a class="reference internal" href="_modules/equipy/graphs/_waterfall_plot.html#fair_waterfall_plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#equipy.graphs.fair_waterfall_plot" title="Permalink to this definition">#</a></dt>
 <dd><p>Generate a waterfall plot illustrating the sequential fairness in a model.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -504,7 +482,7 @@ The legend is added to distinguish between different bars in the plot.</p>
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-equipy.graphs">Module contents</a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-contents">Module contents</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#equipy.graphs.fair_arrow_plot"><code class="docutils literal notranslate"><span class="pre">fair_arrow_plot()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#equipy.graphs.fair_density_plot"><code class="docutils literal notranslate"><span class="pre">fair_density_plot()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#equipy.graphs.fair_multiple_arrow_plot"><code class="docutils literal notranslate"><span class="pre">fair_multiple_arrow_plot()</span></code></a></li>
@@ -525,7 +503,7 @@ The legend is added to distinguish between different bars in the plot.</p>
   <div class="footer-item">
     
 <p class="component-author">
-By Agathe F, Suzie G, Francois H, Philipp R
+By Agathe F, Suzie G, Francois H, Philipp R, Arthur C
 </p>
 
   </div>
@@ -535,7 +513,7 @@ By Agathe F, Suzie G, Francois H, Philipp R
 
   <p class="copyright">
     
-      © Copyright 2023, Agathe F, Suzie G, Francois H, Philipp R.
+      © Copyright 2023, Agathe F, Suzie G, Francois H, Philipp R, Arthur C.
       <br/>
     
   </p>

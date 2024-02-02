@@ -139,14 +139,8 @@
 <li class="toctree-l3"><a class="reference internal" href="equipy.fairness.html">equipy.fairness package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="equipy.graphs.html">equipy.graphs package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="equipy.metrics.html">equipy.metrics package</a></li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="equipy.utils.html">equipy.utils package</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l4"><a class="reference internal" href="equipy.utils.permutations.html">equipy.utils.permutations package</a></li>
 </ul>
 </li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="setup.html">setup module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tests.html">tests module</a></li>
 </ul>
 </li>
 </ul>
@@ -313,13 +307,14 @@ document.write(`
                   
   <section id="welcome-to-equipy-s-documentation">
 <h1>Welcome to EquiPy’s documentation!<a class="headerlink" href="#welcome-to-equipy-s-documentation" title="Permalink to this heading">#</a></h1>
+<p><strong>EquiPy</strong> is a library implementing sequential fairness on the predicted outputs of Machine Learning models, when dealing with multiple sensitive attributes.
+The library contains a set of classes that implement the methodology and a module for visualizations.</p>
+<p>Under the hood, we use a post-processing method to progressively achieve fairness accross a set of sensitive features by leveraging multi-marginal Wasserstein barycenters, which extends the standard notion of Strong Demographic Parity to the case with multiple sensitive characteristics. This approach seamlessly extends to approximate fairness, enveloping a framework accommodating the trade-off between performance and unfairness. You can find the technical details in the technical paper <a class="reference external" href="https://arxiv.org/abs/2309.06627">https://arxiv.org/abs/2309.06627</a> (forthcoming at AAAI 2024).</p>
 <div class="toctree-wrapper compound">
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="modules.html">equipy</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="equipy.html">equipy package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="setup.html">setup module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tests.html">tests module</a></li>
 </ul>
 </li>
 </ul>
@@ -386,7 +381,7 @@ document.write(`
   <div class="footer-item">
     
 <p class="component-author">
-By Agathe F, Suzie G, Francois H, Philipp R
+By Agathe F, Suzie G, Francois H, Philipp R, Arthur C
 </p>
 
   </div>
@@ -396,7 +391,7 @@ By Agathe F, Suzie G, Francois H, Philipp R
 
   <p class="copyright">
     
-      © Copyright 2023, Agathe F, Suzie G, Francois H, Philipp R.
+      © Copyright 2023, Agathe F, Suzie G, Francois H, Philipp R, Arthur C.
       <br/>
     
   </p>

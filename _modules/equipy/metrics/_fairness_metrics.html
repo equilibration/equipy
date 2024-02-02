@@ -137,14 +137,8 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../equipy.fairness.html">equipy.fairness package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../equipy.graphs.html">equipy.graphs package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../equipy.metrics.html">equipy.metrics package</a></li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../equipy.utils.html">equipy.utils package</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../../equipy.utils.permutations.html">equipy.utils.permutations package</a></li>
 </ul>
 </li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../../../setup.html">setup module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../tests.html">tests module</a></li>
 </ul>
 </li>
 </ul>
@@ -250,13 +244,18 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for equipy.metrics._fairness_metrics</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">matplotlib.collections</span> <span class="kn">import</span> <span class="n">EventCollection</span>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Computation of the fairness (i.e. measurement of the similarity in prediction distribution between different population groups according to their sensitive attributes).</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c1"># Authors: Agathe F, Suzie G, Francois H, Philipp R, Arthur C</span>
+<span class="c1"># License: BSD 3 clause</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">accuracy_score</span><span class="p">,</span> <span class="n">mean_squared_error</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">from</span> <span class="nn">scipy.interpolate</span> <span class="kn">import</span> <span class="n">interp1d</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">ot</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span>
 
 <span class="c1"># WARNING:You cannot calculate the EQF function of a single value : this means that if only one individual</span>
 <span class="c1"># has a specific sensitive value, you cannot use the transform function.</span>
@@ -291,25 +290,17 @@ document.write(`
 <span class="sd">    __call__(value_)</span>
 <span class="sd">        Callable method to compute the interpolated value for a given quantile.</span>
 
-<span class="sd">    Example usage</span>
-<span class="sd">    -------------</span>
-<span class="sd">    &gt;&gt;&gt; sample_data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]</span>
-<span class="sd">    &gt;&gt;&gt; eqf = EQF(sample_data)</span>
-<span class="sd">    &gt;&gt;&gt; print(eqf(0.5))  # Interpolated value at quantile 0.5</span>
-<span class="sd">    5.5</span>
-
-<span class="sd">    Example usage</span>
-<span class="sd">    -------------</span>
-<span class="sd">    &gt;&gt;&gt; sample_data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]</span>
-<span class="sd">    &gt;&gt;&gt; eqf = EQF(sample_data)</span>
-<span class="sd">    &gt;&gt;&gt; print(eqf([0.2, 0.5, 0.8]))  # Interpolated value at quantiles 0.2, 0.5, and 0.8</span>
-<span class="sd">    [2.8 5.5 8.2]</span>
-
-
 <span class="sd">    Raises</span>
 <span class="sd">    ------</span>
 <span class="sd">    ValueError</span>
 <span class="sd">        If the input value_ is outside the range [0, 1].</span>
+
+<span class="sd">    Example </span>
+<span class="sd">    -------</span>
+<span class="sd">    &gt;&gt;&gt; sample_data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]</span>
+<span class="sd">    &gt;&gt;&gt; eqf = EQF(sample_data)</span>
+<span class="sd">    &gt;&gt;&gt; print(eqf([0.2, 0.5, 0.8]))  # Interpolated value at quantiles 0.2, 0.5, and 0.8</span>
+<span class="sd">    [2.8 5.5 8.2]</span>
 
 <span class="sd">    Note</span>
 <span class="sd">    ----</span>
@@ -317,14 +308,12 @@ document.write(`
 <span class="sd">    - The input sample_data should be a list or array-like containing numerical values.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-                 <span class="n">sample_data</span><span class="p">,</span>
-                 <span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample_data</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]]):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_eqf</span><span class="p">(</span><span class="n">sample_data</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sample_data</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;One of your sample data contains a single value&#39;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_calculate_eqf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample_data</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_calculate_eqf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample_data</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Calculate the Empirical Quantile Function for the given sample data.</span>
 
@@ -357,7 +346,7 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">min_val</span> <span class="o">=</span> <span class="n">sorted_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">max_val</span> <span class="o">=</span> <span class="n">sorted_data</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value_</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value_</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Compute the interpolated value for a given quantile.</span>
 
@@ -392,7 +381,7 @@ document.write(`
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Error with input value&#39;</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">diff_quantile</span><span class="p">(</span><span class="n">data1</span><span class="p">,</span> <span class="n">data2</span><span class="p">,</span> <span class="n">n_min</span><span class="o">=</span><span class="mi">1000</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">diff_quantile</span><span class="p">(</span><span class="n">data1</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">data2</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">n_min</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Compute the unfairness between two populations based on their quantile functions. </span>
 <span class="sd">    If the number of points in data1 is less than n_min, compute the Wasserstein distance using the POT package. </span>
@@ -400,9 +389,9 @@ document.write(`
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    data1 : array-like</span>
+<span class="sd">    data1 : np.ndarray</span>
 <span class="sd">        The first set of data points.</span>
-<span class="sd">    data2 : array-like</span>
+<span class="sd">    data2 : np.ndarray</span>
 <span class="sd">        The second set of data points.</span>
 <span class="sd">    n_min : float</span>
 <span class="sd">        Below this threshold, compute the Wasserstein distance.</span>
@@ -441,7 +430,7 @@ document.write(`
     <span class="k">return</span> <span class="n">unfair_value</span>
 
 
-<div class="viewcode-block" id="unfairness"><a class="viewcode-back" href="../../../equipy.metrics.html#equipy.metrics.unfairness">[docs]</a><span class="k">def</span> <span class="nf">unfairness</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">sensitive_features</span><span class="p">,</span> <span class="n">n_min</span><span class="o">=</span><span class="mi">1000</span><span class="p">):</span>
+<div class="viewcode-block" id="unfairness"><a class="viewcode-back" href="../../../equipy.metrics.html#equipy.metrics.unfairness">[docs]</a><span class="k">def</span> <span class="nf">unfairness</span><span class="p">(</span><span class="n">y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">sensitive_features</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">n_min</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Compute the unfairness value for a given fair output (y) and multiple sensitive attributes data (sensitive_features) containing several modalities.</span>
 <span class="sd">    If there is a single sensitive feature, it calculates the maximum quantile difference between different modalities of that single sensitive feature.</span>
@@ -450,9 +439,9 @@ document.write(`
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    y : array-like</span>
+<span class="sd">    y : np.ndarray</span>
 <span class="sd">        Predicted (fair or not) output data.</span>
-<span class="sd">    sensitive_features : array-like</span>
+<span class="sd">    sensitive_features : np.ndarray</span>
 <span class="sd">        Sensitive attribute data.</span>
 <span class="sd">    n_min : float</span>
 <span class="sd">        Below this threshold, compute the unfairness based on the Wasserstein distance.</span>
@@ -489,7 +478,7 @@ document.write(`
     <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="n">new_list</span><span class="p">)</span></div>
 
 
-<span class="k">def</span> <span class="nf">unfairness_dict</span><span class="p">(</span><span class="n">y_fair_dict</span><span class="p">,</span> <span class="n">sensitive_features</span><span class="p">,</span> <span class="n">n_min</span><span class="o">=</span><span class="mi">1000</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">unfairness_dict</span><span class="p">(</span><span class="n">y_fair_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span> <span class="n">sensitive_features</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">n_min</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Compute unfairness values for sequentially fair output datasets and multiple sensitive attributes datasets.</span>
 
@@ -520,9 +509,9 @@ document.write(`
 <span class="sd">    {&#39;sensitive_feature_0&#39;: 46.0, &#39;sensitive_feature_1&#39;: 28.0, &#39;sensitive_feature_2&#39;: 14.0}</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">unfairness_dict</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">y_fair</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">y_fair_dict</span><span class="o">.</span><span class="n">values</span><span class="p">()):</span>
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">y_fair</span> <span class="ow">in</span> <span class="n">y_fair_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="n">result</span> <span class="o">=</span> <span class="n">unfairness</span><span class="p">(</span><span class="n">y_fair</span><span class="p">,</span> <span class="n">sensitive_features</span><span class="p">,</span> <span class="n">n_min</span><span class="p">)</span>
-        <span class="n">unfairness_dict</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;sensitive_feature_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span>
+        <span class="n">unfairness_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span>
     <span class="k">return</span> <span class="n">unfairness_dict</span>
 </pre></div>
 
@@ -552,7 +541,7 @@ document.write(`
   <div class="footer-item">
     
 <p class="component-author">
-By Agathe F, Suzie G, Francois H, Philipp R
+By Agathe F, Suzie G, Francois H, Philipp R, Arthur C
 </p>
 
   </div>
@@ -562,7 +551,7 @@ By Agathe F, Suzie G, Francois H, Philipp R
 
   <p class="copyright">
     
-      © Copyright 2023, Agathe F, Suzie G, Francois H, Philipp R.
+      © Copyright 2023, Agathe F, Suzie G, Francois H, Philipp R, Arthur C.
       <br/>
     
   </p>

@@ -137,14 +137,8 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../equipy.fairness.html">equipy.fairness package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../equipy.graphs.html">equipy.graphs package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../equipy.metrics.html">equipy.metrics package</a></li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../equipy.utils.html">equipy.utils package</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../../equipy.utils.permutations.html">equipy.utils.permutations package</a></li>
 </ul>
 </li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../../../setup.html">setup module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../tests.html">tests module</a></li>
 </ul>
 </li>
 </ul>
@@ -250,22 +244,30 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for equipy.metrics._performance_metrics</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">mean_squared_error</span>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Computation of the performance (i.e. measurement of the similarity between prediction and actual value).</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c1"># Authors: Agathe F, Suzie G, Francois H, Philipp R, Arthur C</span>
+<span class="c1"># License: BSD 3 clause</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">mean_squared_error</span>
 <span class="kn">from</span> <span class="nn">..utils.checkers</span> <span class="kn">import</span> <span class="n">_check_metric</span>
 
 
-<div class="viewcode-block" id="performance"><a class="viewcode-back" href="../../../equipy.metrics.html#equipy.metrics.performance">[docs]</a><span class="k">def</span> <span class="nf">performance</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="n">mean_squared_error</span><span class="p">):</span>
+<div class="viewcode-block" id="performance"><a class="viewcode-back" href="../../../equipy.metrics.html#equipy.metrics.performance">[docs]</a><span class="k">def</span> <span class="nf">performance</span><span class="p">(</span><span class="n">y_true</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">metric</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">=</span> <span class="n">mean_squared_error</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Compute the performance value for predicted fair output compared to the true labels.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    y_true : array-like</span>
-<span class="sd">        True labels or ground truth values.</span>
-<span class="sd">    y_pred : array-like</span>
-<span class="sd">        Predicted (fair or not) output values.</span>
-<span class="sd">    metric : callable, optional</span>
-<span class="sd">        The metric used to compute the performance, default=sklearn.metrics.mean_square_error.</span>
+<span class="sd">    y_true : np.ndarray</span>
+<span class="sd">        Actual values.</span>
+<span class="sd">    y_pred : np.ndarray</span>
+<span class="sd">        Predicted (fair or not) output values. </span>
+<span class="sd">    metric : Callable, (default=mean_squared_error)</span>
+<span class="sd">        The metric used to compute the performance, which expects y_true then y_pred, default=sklearn.metrics.mean_square_error.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -292,17 +294,17 @@ document.write(`
     <span class="k">return</span> <span class="n">metric</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span></div>
 
 
-<span class="k">def</span> <span class="nf">performance_dict</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_fair_dict</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="n">mean_squared_error</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">performance_dict</span><span class="p">(</span><span class="n">y_true</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">y_fair_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span> <span class="n">metric</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">=</span> <span class="n">mean_squared_error</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Compute the performance values for multiple fair output datasets compared to the true labels.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    y_true : array-like</span>
-<span class="sd">        True labels or ground truth values.</span>
+<span class="sd">    y_true : np.ndarray</span>
+<span class="sd">        Actual values.</span>
 <span class="sd">    y_fair_dict : dict</span>
 <span class="sd">        A dictionary containing sequentially fair output datasets.</span>
-<span class="sd">    metric : callable, optional</span>
+<span class="sd">    metric : Callable, optional</span>
 <span class="sd">        The metric used to compute the performance, default=sklearn.metrics.mean_square_error.</span>
 
 <span class="sd">    Returns</span>
@@ -350,7 +352,7 @@ document.write(`
   <div class="footer-item">
     
 <p class="component-author">
-By Agathe F, Suzie G, Francois H, Philipp R
+By Agathe F, Suzie G, Francois H, Philipp R, Arthur C
 </p>
 
   </div>
@@ -360,7 +362,7 @@ By Agathe F, Suzie G, Francois H, Philipp R
 
   <p class="copyright">
     
-      © Copyright 2023, Agathe F, Suzie G, Francois H, Philipp R.
+      © Copyright 2023, Agathe F, Suzie G, Francois H, Philipp R, Arthur C.
       <br/>
     
   </p>

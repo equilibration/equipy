@@ -44,7 +44,6 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'equipy.metrics';</script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="equipy.utils package" href="equipy.utils.html" />
     <link rel="prev" title="equipy.graphs package" href="equipy.graphs.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -140,14 +139,8 @@
 <li class="toctree-l3"><a class="reference internal" href="equipy.fairness.html">equipy.fairness package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="equipy.graphs.html">equipy.graphs package</a></li>
 <li class="toctree-l3 current active"><a class="current reference internal" href="#">equipy.metrics package</a></li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="equipy.utils.html">equipy.utils package</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l4"><a class="reference internal" href="equipy.utils.permutations.html">equipy.utils.permutations package</a></li>
 </ul>
 </li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="setup.html">setup module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tests.html">tests module</a></li>
 </ul>
 </li>
 </ul>
@@ -298,7 +291,7 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-equipy.metrics">Module contents</a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-contents">Module contents</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#equipy.metrics.performance"><code class="docutils literal notranslate"><span class="pre">performance()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#equipy.metrics.unfairness"><code class="docutils literal notranslate"><span class="pre">unfairness()</span></code></a></li>
 </ul>
@@ -316,18 +309,19 @@ document.write(`
                   
   <section id="equipy-metrics-package">
 <h1>equipy.metrics package<a class="headerlink" href="#equipy-metrics-package" title="Permalink to this heading">#</a></h1>
-<section id="module-equipy.metrics">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-equipy.metrics" title="Permalink to this heading">#</a></h2>
-<dl class="py function">
+<section id="module-contents">
+<h2>Module contents<a class="headerlink" href="#module-contents" title="Permalink to this heading">#</a></h2>
+<p>Computation of the fairness (i.e. measurement of the similarity in prediction distribution between different population groups according to their sensitive attributes) and performance (i.e. measurement of the similarity between prediction and actual value).</p>
+<span class="target" id="module-equipy.metrics"></span><dl class="py function">
 <dt class="sig sig-object py" id="equipy.metrics.performance">
-<span class="sig-prename descclassname"><span class="pre">equipy.metrics.</span></span><span class="sig-name descname"><span class="pre">performance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y_true</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_pred</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metric=&lt;function</span> <span class="pre">mean_squared_error&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/equipy/metrics/_performance_metrics.html#performance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#equipy.metrics.performance" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">equipy.metrics.</span></span><span class="sig-name descname"><span class="pre">performance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y_true:</span> <span class="pre">~numpy.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_pred:</span> <span class="pre">~numpy.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metric:</span> <span class="pre">~typing.Callable</span> <span class="pre">=</span> <span class="pre">&lt;function</span> <span class="pre">mean_squared_error&gt;</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="_modules/equipy/metrics/_performance_metrics.html#performance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#equipy.metrics.performance" title="Permalink to this definition">#</a></dt>
 <dd><p>Compute the performance value for predicted fair output compared to the true labels.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>y_true</strong> (<em>array-like</em>) – True labels or ground truth values.</p></li>
-<li><p><strong>y_pred</strong> (<em>array-like</em>) – Predicted (fair or not) output values.</p></li>
-<li><p><strong>metric</strong> (<em>callable</em><em>, </em><em>optional</em>) – The metric used to compute the performance, default=sklearn.metrics.mean_square_error.</p></li>
+<li><p><strong>y_true</strong> (<em>np.ndarray</em>) – Actual values.</p></li>
+<li><p><strong>y_pred</strong> (<em>np.ndarray</em>) – Predicted (fair or not) output values.</p></li>
+<li><p><strong>metric</strong> (<em>Callable</em><em>, </em><em>(</em><em>default=mean_squared_error</em><em>)</em>) – The metric used to compute the performance, which expects y_true then y_pred, default=sklearn.metrics.mean_square_error.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -356,7 +350,7 @@ document.write(`
 
 <dl class="py function">
 <dt class="sig sig-object py" id="equipy.metrics.unfairness">
-<span class="sig-prename descclassname"><span class="pre">equipy.metrics.</span></span><span class="sig-name descname"><span class="pre">unfairness</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sensitive_features</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_min</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/equipy/metrics/_fairness_metrics.html#unfairness"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#equipy.metrics.unfairness" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">equipy.metrics.</span></span><span class="sig-name descname"><span class="pre">unfairness</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sensitive_features</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_min</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1000</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="_modules/equipy/metrics/_fairness_metrics.html#unfairness"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#equipy.metrics.unfairness" title="Permalink to this definition">#</a></dt>
 <dd><p>Compute the unfairness value for a given fair output (y) and multiple sensitive attributes data (sensitive_features) containing several modalities.
 If there is a single sensitive feature, it calculates the maximum quantile difference between different modalities of that single sensitive feature.
 If there are multiple sensitive features, it calculates the maximum quantile difference for each sensitive feature
@@ -364,8 +358,8 @@ and then takes the maximum of these maximums.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>y</strong> (<em>array-like</em>) – Predicted (fair or not) output data.</p></li>
-<li><p><strong>sensitive_features</strong> (<em>array-like</em>) – Sensitive attribute data.</p></li>
+<li><p><strong>y</strong> (<em>np.ndarray</em>) – Predicted (fair or not) output data.</p></li>
+<li><p><strong>sensitive_features</strong> (<em>np.ndarray</em>) – Sensitive attribute data.</p></li>
 <li><p><strong>n_min</strong> (<em>float</em>) – Below this threshold, compute the unfairness based on the Wasserstein distance.</p></li>
 </ul>
 </dd>
@@ -409,15 +403,6 @@ and then takes the maximum of these maximums.</p>
         <p class="prev-next-title">equipy.graphs package</p>
       </div>
     </a>
-    <a class="right-next"
-       href="equipy.utils.html"
-       title="next page">
-      <div class="prev-next-info">
-        <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">equipy.utils package</p>
-      </div>
-      <i class="fa-solid fa-angle-right"></i>
-    </a>
 </div>
                 </footer>
               
@@ -433,7 +418,7 @@ and then takes the maximum of these maximums.</p>
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-equipy.metrics">Module contents</a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-contents">Module contents</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#equipy.metrics.performance"><code class="docutils literal notranslate"><span class="pre">performance()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#equipy.metrics.unfairness"><code class="docutils literal notranslate"><span class="pre">unfairness()</span></code></a></li>
 </ul>
@@ -452,7 +437,7 @@ and then takes the maximum of these maximums.</p>
   <div class="footer-item">
     
 <p class="component-author">
-By Agathe F, Suzie G, Francois H, Philipp R
+By Agathe F, Suzie G, Francois H, Philipp R, Arthur C
 </p>
 
   </div>
@@ -462,7 +447,7 @@ By Agathe F, Suzie G, Francois H, Philipp R
 
   <p class="copyright">
     
-      © Copyright 2023, Agathe F, Suzie G, Francois H, Philipp R.
+      © Copyright 2023, Agathe F, Suzie G, Francois H, Philipp R, Arthur C.
       <br/>
     
   </p>
