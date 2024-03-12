@@ -17,7 +17,7 @@ from typing import Optional
 
 class FairWasserstein(BaseHelper):
     """
-    Class implementing Wasserstein distance-based fairness adjustment for binary classification tasks.
+    Class implementing Wasserstein distance-based fairness adjustment for binary classification and regression tasks regarding a single sensitive attribute.
 
     Parameters
     ----------
