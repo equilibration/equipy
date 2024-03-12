@@ -92,7 +92,7 @@ def _check_metric(y: np.ndarray, metric: Callable) -> None:
     Warning 
         If it is classification.
     """
-    if np.all(np.isin(y, [0, 1])) and metric ==  mean_squared_error:
+    if np.all(np.isin(y, [0, 1])) and (metric ==  mean_squared_error):
         warnings.warn(
             "You used mean squared error as metric but it looks like you are using classification scores")
 
