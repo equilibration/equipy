@@ -206,7 +206,6 @@ def fair_waterfall_plot(sensitive_features_calib: np.ndarray,
     init_unfs_exact = unfairness_dict(y_sequential_fair, sensitive_features_test)
     unfs_exact = {key: round(value, 4) for key, value in init_unfs_exact.items()}
     unfs_approx = None
-    print(unfs_exact, unfs_approx)
 
     if epsilon is not None:
         approx_wst = MultiWasserstein()
@@ -215,7 +214,6 @@ def fair_waterfall_plot(sensitive_features_calib: np.ndarray,
         approx_y_sequential_fair = approx_wst.get_sequential_fairness()
         init_unfs_approx = unfairness_dict(approx_y_sequential_fair, sensitive_features_test)
         unfs_approx = {key: round(value, 4) for key, value in init_unfs_approx.items()}
-        print(unfs_exact, unfs_approx)
     
     fig, ax = plt.subplots()
 
@@ -289,4 +287,4 @@ def fair_waterfall_plot(sensitive_features_calib: np.ndarray,
     ax.set_title(
         f'Sequential ({"exact" if unfs_approx is None else "approximate"}) fairness')
     plt.show()
-    return ax, unfs_exact, unfs_approx
+    return ax
