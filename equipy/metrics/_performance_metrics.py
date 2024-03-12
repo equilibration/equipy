@@ -43,7 +43,7 @@ def performance(y_true: np.ndarray, y_pred: np.ndarray, metric: Callable = mean_
     0.05
     """
 
-    _check_metric(y_true)
+    _check_metric(y_true, metric)
 
     return metric(y_true, y_pred)
 

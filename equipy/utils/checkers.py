@@ -2,9 +2,11 @@
 
 import numpy as np
 import warnings
+from typing import Callable
+from sklearn.metrics import mean_squared_error
 
 
-def _check_metric(y: np.ndarray) -> None:
+def _check_metric(y: np.ndarray, metric: Callable) -> None:
     """
     Check that it is regression and not classification.
 
@@ -12,13 +14,14 @@ def _check_metric(y: np.ndarray) -> None:
     ----------
     y : np.ndarray, shape (n_samples,)
         Observed, true values.
-
+    metric : Callable,
+        The metric used to compute the performance.
     Raises
     ------
     Warning 
         If it is classification.
     """
-    if np.all(np.isin(y, [0, 1])):
+    if np.all(np.isin(y, [0, 1])) and metric ==  mean_squared_error:
         warnings.warn(
             "You used mean squared error as metric but it looks like you are using classification scores")
 
