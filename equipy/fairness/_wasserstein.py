@@ -297,3 +297,16 @@ class MultiWasserstein():
                 y_inter, sens, epsilon[i])
             self.y_fair[f'sensitive_feature_{i+1}'] = y_inter
         return self.y_fair[f'sensitive_feature_{i+1}']
+    
+    def get_sequential_fairness(self) -> dict:
+        """
+        Returns a dictionary containing fair outputs generated at each iteration of the application of the transform method.
+        These outputs represent the predictions for the test data after enforcing fairness at each step.
+
+        Returns
+        -------
+        y_sequential_fair : dict
+            A dictionary containing fair predictions for the test data at each iteration of applying the fairness transformations, regarding one sensitive attribute.
+        """
+        y_sequential_fair = self.y_fair
+        return y_sequential_fair
