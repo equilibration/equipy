@@ -2,8 +2,79 @@
 
 import numpy as np
 import warnings
-from typing import Callable
+from typing import Callable, Dict, Any, Optional, Union
 from sklearn.metrics import mean_squared_error
+
+def get_subtype(arr):
+    """
+    Returns the subtype of the elements in the NumPy array.
+
+    Parameters
+    ----------
+    arr : np.ndarray
+
+    Raises
+    ------
+    Subtype of the elements in the array (e.g., 'np.integer', 'np.floating', etc.)
+    """
+    if np.issubdtype(arr.dtype, np.integer):
+        return np.integer
+    elif np.issubdtype(arr.dtype, np.floating):
+        return np.floating
+    elif np.issubdtype(arr.dtype, np.bool_):
+        return np.bool_
+    elif np.issubdtype(arr.dtype, np.character):
+        return np.character
+    else:
+        return arr.dtype
+    
+def _check_type(y_true: np.ndarray, y_dict: Dict[Any, Dict[Any, Any]], threshold: Optional[float] = None) -> None:
+    """
+    Check the types of observed events and fair outputs.
+
+    Parameters
+    ----------
+    y_true : np.ndarray, shape (n_samples,)
+        Observed, true values.
+    y_dict : dict
+        Dictionary containing fair predictions for different permutations of sensitive features. Each value is itself a dictionary
+        representing fair predictions for a specific permutation of sensitive features.
+    threshold : float, default = None
+        The threshold used to transform scores from binary classification into labels for evaluation of performance.
+
+    Raises
+    ------
+    ValueError
+        If y_true and the values in y_dict are not of the same type.
+    """
+    type_y_true = get_subtype(y_true)
+    type_y_fair = get_subtype(list(list(y_dict.values())[0].values())[0])
+
+    if type_y_true != type_y_fair and threshold is None:
+        raise ValueError(
+            "Specify a threshold to transform scores into labels when using a classification performance metric")
+    
+def _check_positive_class(y_true: np.ndarray, positive_class: Union[int, str] = 1) -> None:
+    """
+    Check the types of observed events and fair outputs.
+
+    Parameters
+    ----------
+    y_true : np.ndarray, shape (n_samples,)
+        Observed, true values.
+   positive_class : int or str, optional, default=1
+        The positive class label used for applying threshold in the case of binary classification. Can be either an integer or a string.
+
+    Raises
+    ------
+    ValueError
+        If y_true and the values in y_dict are not of the same type.
+    """
+    y_true_modalities = list(set(y_true))
+
+    if (positive_class == 1) and (1 not in y_true_modalities):
+        raise ValueError(
+            "Specify a positive class if using positive labels other than 1")
 
 
 def _check_metric(y: np.ndarray, metric: Callable) -> None:

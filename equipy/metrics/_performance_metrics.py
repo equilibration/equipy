@@ -5,7 +5,7 @@ Computation of the performance (i.e. measurement of the similarity between predi
 # Authors: Agathe F, Suzie G, Francois H, Philipp R, Arthur C
 # License: BSD 3 clause
 import numpy as np
-from typing import Callable
+from typing import Callable, Optional, Union
 from sklearn.metrics import mean_squared_error
 from ..utils.checkers import _check_metric
 
@@ -48,7 +48,7 @@ def performance(y_true: np.ndarray, y_pred: np.ndarray, metric: Callable = mean_
     return metric(y_true, y_pred)
 
 
-def performance_dict(y_true: np.ndarray, y_fair_dict: dict[str, np.ndarray], metric: Callable = mean_squared_error) -> dict[str, float]:
+def performance_dict(y_true: np.ndarray, y_fair_dict: dict[str, np.ndarray], metric: Callable = mean_squared_error, threshold: Optional[float] = None, positive_class: Union[int, str] = 1) -> dict[str, float]:
     """
     Compute the performance values for multiple fair output datasets compared to the true labels.
 
@@ -60,6 +60,10 @@ def performance_dict(y_true: np.ndarray, y_fair_dict: dict[str, np.ndarray], met
         A dictionary containing sequentially fair output datasets.
     metric : Callable, optional
         The metric used to compute the performance, default=sklearn.metrics.mean_square_error.
+    threshold : float, default = None
+        The threshold used to transform scores from binary classification into labels for evaluation of performance.
+    positive_class : int or str, optional, default=1
+        The positive class label used for applying threshold in the case of binary classification. Can be either an integer or a string.
 
     Returns
     -------
@@ -74,7 +78,16 @@ def performance_dict(y_true: np.ndarray, y_fair_dict: dict[str, np.ndarray], met
     >>> print(performance_values)
     {'Base model': 8.666666666666666, 'sensitive_feature_1': 125.66666666666667, 'sensitive_feature_2': 282.0}
     """
+
+    if threshold is not None:
+        negative_class = list(set(y_true) - {positive_class})[0]
+
     performance_dict = {}
     for key in y_fair_dict.keys():
-        performance_dict[key] = metric(y_true, list(y_fair_dict[key]))
+        if threshold is not None:
+            scores_fair = list(y_fair_dict[key])
+            labels_fair = [positive_class if score >= threshold else negative_class for score in scores_fair]
+            performance_dict[key] = metric(y_true, labels_fair)
+        else:
+            performance_dict[key] = metric(y_true, list(y_fair_dict[key]))
     return performance_dict
