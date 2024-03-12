@@ -189,7 +189,7 @@ def unfairness(y: np.ndarray, sensitive_features: np.ndarray, n_min: float = 100
     Compute the unfairness value for a given fair output (y) and multiple sensitive attributes data (sensitive_features) containing several modalities.
     If there is a single sensitive feature, it calculates the maximum quantile difference between different modalities of that single sensitive feature.
     If there are multiple sensitive features, it calculates the maximum quantile difference for each sensitive feature
-    and then takes the maximum of these maximums.
+    and then takes the sum of these maximums.
 
     Parameters
     ----------
@@ -220,7 +220,7 @@ def unfairness(y: np.ndarray, sensitive_features: np.ndarray, n_min: float = 100
         for modality in modalities:
             y_modality = y[sensitive_features == modality]
             lst_unfairness.append(diff_quantile(y, y_modality, n_min))
-        new_list.append(max(lst_unfairness))
+        unfs = max(lst_unfairness)
     else:
         for sensitive_feature in sensitive_features.T:
             modalities = list(set(sensitive_feature))
@@ -229,7 +229,8 @@ def unfairness(y: np.ndarray, sensitive_features: np.ndarray, n_min: float = 100
                 y_modality = y[sensitive_feature == modality]
                 lst_unfairness.append(diff_quantile(y, y_modality, n_min))
             new_list.append(max(lst_unfairness))
-    return max(new_list)
+        unfs = np.sum(new_list)
+    return unfs
 
 
 def unfairness_dict(y_fair_dict: dict[str, np.ndarray], sensitive_features: np.ndarray, n_min: float = 1000) -> dict[str, float]:
