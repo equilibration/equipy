@@ -1,6 +1,7 @@
 """Check inputs formats."""
 
 import numpy as np
+import pandas as pd
 import warnings
 from typing import Callable, Dict, Any, Optional, Union
 from sklearn.metrics import mean_squared_error
@@ -97,13 +98,13 @@ def _check_metric(y: np.ndarray, metric: Callable) -> None:
             "You used mean squared error as metric but it looks like you are using classification scores")
 
 
-def _check_nb_observations(sensitive_features: np.ndarray) -> None:
+def _check_nb_observations(sensitive_features: pd.DataFrame) -> None:
     """
     Check that there is more than one observation.
 
     Parameters
     ----------
-    sensitive_features : np.ndarray, shape (n_samples, n_sensitive_features)
+    sensitive_features : pd.DataFrame, shape (n_samples, n_sensitive_features)
         The calibration samples representing multiple sensitive attributes.
 
     Raises
@@ -111,13 +112,11 @@ def _check_nb_observations(sensitive_features: np.ndarray) -> None:
     ValueError
         If there is only a single observation
     """
-    if sensitive_features.ndim == 1 & len(sensitive_features) == 1:
-        raise ValueError("Fairness can not be applied on a single observation")
-    if sensitive_features.ndim == 2 & np.shape(sensitive_features)[1] == 1:
-        raise ValueError("Fairness can not be applied on a single observation")
+    if len(sensitive_features) == 1:
+        raise ValueError("Fairness correction can not be applied on a single observation")
 
 
-def _check_shape(y: np.ndarray, sensitive_feature: np.ndarray) -> None:
+def _check_shape(y: np.ndarray, sensitive_features: pd.DataFrame) -> None:
     """
     Check the shape and data types of input arrays y and sensitive_feature.
 
@@ -125,31 +124,73 @@ def _check_shape(y: np.ndarray, sensitive_feature: np.ndarray) -> None:
     ----------
     y :  np.ndarray, shape (n_samples,)
         Target values of the data.
-    sensitive_feature : np.ndarray, shape (n_samples,)
-        Input samples representing the sensitive attribute.
+    sensitive_features : pd.DataFrame, shape (n_samples, n_sensitive_features)
+        Input samples representing the sensitive attributes.
 
     Raises
     ------
     ValueError
         If the input arrays have incorrect shapes or data types.
     """
-    if not isinstance(sensitive_feature, np.ndarray):
-        raise ValueError('sensitive_features must be an array')
+    if not isinstance(sensitive_features, pd.DataFrame):
+        raise ValueError('sensitive_features must be a pandas DataFrame')
 
     if not isinstance(y, np.ndarray):
         raise ValueError('y must be an array')
 
-    if len(sensitive_feature) != len(y):
+    if len(sensitive_features) != len(y):
         raise ValueError(
             'sensitive_features and y should have the same length')
-
-    if len(np.unique(sensitive_feature)) == 1:
-        raise ValueError(
-            "At least one of your sensitive attributes contains only one modality and so it is already fair. Remove it from your sensitive features.")
-
+    
     if not (np.issubdtype(y.dtype, np.floating) or np.issubdtype(y.dtype, np.integer)):
         raise ValueError('y should contain only float or integer numbers')
 
+def _check_unique_mod(sensitive_feature: pd.DataFrame) -> None:
+    """
+    Check the shape and data types of input arrays y and sensitive_feature.
+
+    Parameters
+    ----------
+    sensitive_feature : pd.DataFrame, shape (n_samples, 1)
+        Input samples representing the sensitive attribute.
+
+    Raises
+    ------
+    ValueError
+        If the input of sensitive feature contains a unique modality.
+    """
+
+    if len(np.unique(sensitive_feature)) == 1:
+        raise ValueError(
+            "At least one of your sensitive attributes contains only one modality and so it is already fair. Remove it from your pandas DataFrame of sensitive features.")
+    
+
+def _check_col(columns_calib: pd.core.indexes.base.Index, columns_test: pd.core.indexes.base.Index) -> None:
+    """
+    Check if columns of sensitive_features_calib and sensitive_features_test are similar.
+
+    Parameters
+    ----------
+    sensitive_features_calib : pd.DataFrame
+        DataFrame of sensitive attributes of the calibration data.
+    sensitive_features_test : pd.DataFrame
+        DataFrame of sensitive attributes of the test data.
+
+    Raises
+    ------
+    ValueError
+        If names of columns or number of columns are different between calibration and test data.
+    """
+
+    if len(columns_calib) != len(columns_test):
+        raise ValueError(
+            "Your calibration sensitive features should contain the same number of columns than your test sensitive features")
+    elif set(columns_calib) != set(columns_test):
+        raise ValueError(
+            "Your calibration sensitive features should contain the same column names than your test sensitive features")
+    elif list(columns_calib) != list(columns_test):
+        raise ValueError(
+            "The columns in your calibration sensitive features should be in the same order than in your test sensitive features")
 
 def _check_mod(modalities_calib: list, modalities_test: list) -> None:
     """
@@ -192,7 +233,7 @@ def _check_epsilon(epsilon: float) -> None:
             'epsilon must be between 0 and 1')
 
 
-def _check_epsilon_size(epsilon: list[float], sensitive_features: np.ndarray) -> None:
+def _check_epsilon_size(epsilon: list[float], sensitive_features: pd.DataFrame) -> None:
     """
     Check if the epsilon list matches the number of sensitive features.
 
@@ -201,7 +242,7 @@ def _check_epsilon_size(epsilon: list[float], sensitive_features: np.ndarray) ->
     epsilon : list, shape (n_sensitive_features,)
         Fairness parameters controlling the trade-off between fairness and accuracy for each sensitive feature.
 
-    sensitive_features : np.ndarray, shape (n_samples, n_sensitive_features)
+    sensitive_features : pd.DataFrame, shape (n_samples, n_sensitive_features)
         Test samples representing multiple sensitive attributes.
 
     Raises
@@ -210,11 +251,6 @@ def _check_epsilon_size(epsilon: list[float], sensitive_features: np.ndarray) ->
         If the length of epsilon does not match the number of sensitive features.
     """
 
-    if sensitive_features.ndim == 1:
-        if len(epsilon) != 1:
-            raise ValueError(
-                'epsilon must have the same length than the number of sensitive features')
-    else:
-        if len(epsilon) != np.shape(sensitive_features)[1]:
-            raise ValueError(
-                'epsilon must have the same length than the number of sensitive features')
+    if len(epsilon) != sensitive_features.shape[1]:
+        raise ValueError(
+            'epsilon must have the same length than the number of sensitive features')
