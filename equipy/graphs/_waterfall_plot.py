@@ -220,13 +220,6 @@ def fair_waterfall_plot(sensitive_features_calib: np.ndarray,
     sens = list(unfs_exact.keys())
 
     labels = []
-    #for i in range(len(list(unfs_exact.keys())[1:])):
-    #    if i == 0: 
-    #        labels.append(f"$A_{sens[i]}$-fair")
-    #    elif i == len(list(unfs_exact.keys())[1:])-1: 
-    #        labels.append(f"$A_{1}$" + r"$_:$" + f"$_{sens[i]}$-fair")
-    #    else:
-    #        labels.append(f"$A_{{{','.join(map(str, sens[0:i+1]))}}}$-fair")
 
     labels = [s + '-fair' for s in sens[1:]]
     leg = ('Base model',) + tuple(labels) + ('Final model',)
@@ -280,7 +273,6 @@ def fair_waterfall_plot(sensitive_features_calib: np.ndarray,
                     if unfs_approx is None else tuple(base_approx), pps, ax)
     _add_doted_points(ax, tuple(base_exact)
                       if unfs_approx is None else tuple(base_approx))
-    #ax.set_ylabel(f'Unfairness in $A_{tuple(unfs_exact.keys())[-1][-1]}$')
     ax.set_ylabel('Total unfairness')
     ax.set_ylim(0, base_exact[0]+base_exact[0]/10)
     #ax.set_title(
@@ -289,3 +281,4 @@ def fair_waterfall_plot(sensitive_features_calib: np.ndarray,
         f'Sequential ({"exact" if unfs_approx is None else "approximate"}) fairness')
     plt.show()
     return ax
+

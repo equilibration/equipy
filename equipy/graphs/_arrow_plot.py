@@ -92,7 +92,7 @@ def fair_customized_arrow_plot(unfs_dict: dict[str, np.ndarray],
                       color ="grey")
         if (i == 0) & (base_model):
             line.axes.annotate(f"Base\nmodel", xytext=(
-                x[0]-5*np.min(x)/20, y[0]+5*np.min(y)/20), xy=(x[0], y[0]), size=10)
+                x[0]-5*np.min(x)/20, y[0]-y[0]/80), xy=(x[0], y[0]), size=10)
             ax.scatter(x[0], y[0], label="Base model", marker="^", 
                        color="darkgrey", s=100)
         elif (i == 1) & (first_label_not_used):
@@ -116,8 +116,8 @@ def fair_customized_arrow_plot(unfs_dict: dict[str, np.ndarray],
     ax.set_xlabel("Unfairness")
     ax.set_ylabel("Performance")
     ax.set_title("Exact fairness")
-    ax.legend(loc="lower left")
-    ax.autoscale_view()
+    ax.legend(loc="lower right")
+    #ax.autoscale_view()
     return ax
 
 def fair_arrow_plot(sensitive_features_calib: pd.DataFrame,
