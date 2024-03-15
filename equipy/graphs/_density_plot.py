@@ -54,8 +54,7 @@ def fair_density_plot(sensitive_features_calib: np.ndarray,
         }
     >>> sensitive_features = [[sensitive_features_of_ind_1_values], [sensitive_feature_of_ind_2_values], ...]
     """
-
-    epsilon = None
+    
     exact_wst = MultiWasserstein()
     exact_wst.fit(y_calib, sensitive_features_calib)
     y_final_fair = exact_wst.transform(y_test, sensitive_features_test, epsilon=epsilon)

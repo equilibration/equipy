@@ -49,7 +49,7 @@ def _check_type(y_true: np.ndarray, y_dict: Dict[Any, Dict[Any, Any]], threshold
         If y_true and the values in y_dict are not of the same type.
     """
     type_y_true = get_subtype(y_true)
-    type_y_fair = get_subtype(list(list(y_dict.values())[0].values())[0])
+    type_y_fair = get_subtype(list(y_dict.values())[0])
 
     if type_y_true != type_y_fair and threshold is None:
         raise ValueError(

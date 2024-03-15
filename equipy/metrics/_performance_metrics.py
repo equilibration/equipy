@@ -7,7 +7,7 @@ Computation of the performance (i.e. measurement of the similarity between predi
 import numpy as np
 from typing import Callable, Optional, Union
 from sklearn.metrics import mean_squared_error
-from ..utils.checkers import _check_metric
+from ..utils.checkers import _check_metric, _check_type, _check_positive_class
 
 
 def performance(y_true: np.ndarray, y_pred: np.ndarray, metric: Callable = mean_squared_error) -> float:
@@ -78,10 +78,11 @@ def performance_dict(y_true: np.ndarray, y_fair_dict: dict[str, np.ndarray], met
     >>> print(performance_values)
     {'Base model': 8.666666666666666, 'sensitive_feature_1': 125.66666666666667, 'sensitive_feature_2': 282.0}
     """
-
+    _check_type(y_true, y_fair_dict, threshold=threshold)
     if threshold is not None:
+        _check_positive_class(y_true, positive_class)
         negative_class = list(set(y_true) - {positive_class})[0]
-
+       
     performance_dict = {}
     for key in y_fair_dict.keys():
         if threshold is not None:

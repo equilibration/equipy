@@ -41,9 +41,6 @@ def performance_permutations(y_true: np.ndarray, permut_y_fair_dict: dict[tuple,
      {'Base model': 8.666666666666666, 'sens_var_2': 142.0, 'sens_var_1': 282.0}]
     """
     performance_list = []
-
-    _check_type(y_true, permut_y_fair_dict, threshold=threshold)
-    _check_positive_class(y_true, positive_class)
     
     for value in permut_y_fair_dict.values():
         performance_list.append(performance_dict(
