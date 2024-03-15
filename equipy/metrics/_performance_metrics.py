@@ -50,7 +50,7 @@ def performance(y_true: np.ndarray, y_pred: np.ndarray, metric: Callable = mean_
 
 def performance_dict(y_true: np.ndarray, y_fair_dict: dict[str, np.ndarray], metric: Callable = mean_squared_error, threshold: Optional[float] = None, positive_class: Union[int, str] = 1) -> dict[str, float]:
     """
-    Compute the performance values for multiple fair output datasets compared to the true labels.
+    Compute the performance values for multiple fair output datasets compared to the true events.
 
     Parameters
     ----------
@@ -61,9 +61,9 @@ def performance_dict(y_true: np.ndarray, y_fair_dict: dict[str, np.ndarray], met
     metric : Callable, optional
         The metric used to compute the performance, default=sklearn.metrics.mean_square_error.
     threshold : float, default = None
-        The threshold used to transform scores from binary classification into labels for evaluation of performance.
+        In the case of classification, the threshold used to transform scores from binary classification into labels for evaluation of performance.
     positive_class : int or str, optional, default=1
-        The positive class label used for applying threshold in the case of binary classification. Can be either an integer or a string.
+        In the case of classification, the positive class label used for applying threshold of binary classification. Can be either an integer or a string.
 
     Returns
     -------

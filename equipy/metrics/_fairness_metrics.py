@@ -10,6 +10,7 @@ from scipy.interpolate import interp1d
 import numpy as np
 import ot
 from typing import Union
+import pandas as pd
 
 # WARNING:You cannot calculate the EQF function of a single value : this means that if only one individual
 # has a specific sensitive value, you cannot use the transform function.
@@ -184,7 +185,7 @@ def diff_quantile(data1: np.ndarray, data2: np.ndarray, n_min: float = 1000) -> 
     return unfair_value
 
 
-def unfairness(y: np.ndarray, sensitive_features: np.ndarray, n_min: float = 1000) -> float:
+def unfairness(y: np.ndarray, sensitive_features: pd.DataFrame, n_min: float = 1000) -> float:
     """
     Compute the unfairness value for a given fair output (y) and multiple sensitive attributes data (sensitive_features) containing several modalities.
     If there is a single sensitive feature, it calculates the maximum quantile difference between different modalities of that single sensitive feature.
@@ -195,7 +196,7 @@ def unfairness(y: np.ndarray, sensitive_features: np.ndarray, n_min: float = 100
     ----------
     y : np.ndarray
         Predicted (fair or not) output data.
-    sensitive_features : np.ndarray
+    sensitive_features : pd.DataFrame
         Sensitive attribute data.
     n_min : float
         Below this threshold, compute the unfairness based on the Wasserstein distance.
@@ -214,26 +215,19 @@ def unfairness(y: np.ndarray, sensitive_features: np.ndarray, n_min: float = 100
     6.0
     """
     new_list = []
-    if sensitive_features.ndim == 1:
-        modalities = list(set(sensitive_features))
+    for col in sensitive_features.columns:
+        sensitive_feature = sensitive_features[col]
+        modalities = list(sensitive_feature.unique())
         lst_unfairness = []
         for modality in modalities:
-            y_modality = y[sensitive_features == modality]
+            y_modality = y[sensitive_feature == modality]
             lst_unfairness.append(diff_quantile(y, y_modality, n_min))
-        unfs = max(lst_unfairness)
-    else:
-        for sensitive_feature in sensitive_features.T:
-            modalities = list(set(sensitive_feature))
-            lst_unfairness = []
-            for modality in modalities:
-                y_modality = y[sensitive_feature == modality]
-                lst_unfairness.append(diff_quantile(y, y_modality, n_min))
-            new_list.append(max(lst_unfairness))
-        unfs = np.sum(new_list)
+        new_list.append(max(lst_unfairness))
+    unfs = np.sum(new_list)
     return unfs
 
 
-def unfairness_dict(y_fair_dict: dict[str, np.ndarray], sensitive_features: np.ndarray, n_min: float = 1000) -> dict[str, float]:
+def unfairness_dict(y_fair_dict: dict[str, np.ndarray], sensitive_features: pd.DataFrame, n_min: float = 1000) -> dict[str, float]:
     """
     Compute unfairness values for sequentially fair output datasets and multiple sensitive attributes datasets.
 
@@ -244,7 +238,7 @@ def unfairness_dict(y_fair_dict: dict[str, np.ndarray], sensitive_features: np.n
         containing the fair predictions corresponding to each sensitive feature.
         Each sensitive feature's fairness adjustment is performed sequentially,
         ensuring that each feature is treated fairly relative to the previous ones.
-    sensitive_features : array-like
+    sensitive_features : pd.DataFrame
         Sensitive attribute data.
     n_min : float
         Below this threshold, compute the unfairness based on the Wasserstein distance.
