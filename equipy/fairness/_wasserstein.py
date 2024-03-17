@@ -10,14 +10,15 @@ The module structure is as follows:
 # Authors: Agathe F, Suzie G, Francois H, Philipp R, Arthur C
 # License: BSD 3 clause
 import numpy as np
-from ..utils.checkers import _check_epsilon, _check_epsilon_size, _check_mod, _check_shape, _check_nb_observations
+import pandas as pd
+from ..utils.checkers import _check_epsilon, _check_epsilon_size, _check_mod, _check_shape, _check_nb_observations, _check_col, _check_unique_mod
 from ._base import BaseHelper
 from typing import Optional
 
 
 class FairWasserstein(BaseHelper):
     """
-    Class implementing Wasserstein distance-based fairness adjustment for binary classification tasks.
+    Class implementing Wasserstein distance-based fairness adjustment for binary classification and regression tasks regarding a single sensitive attribute.
 
     Parameters
     ----------
@@ -42,8 +43,9 @@ class FairWasserstein(BaseHelper):
         super().__init__()
         self.sigma = sigma
         self.modalities_calib = None
+        self.columns_calib = None
 
-    def fit(self, y: np.ndarray, sensitive_feature: np.ndarray) -> None:
+    def fit(self, y: np.ndarray, sensitive_feature: pd.DataFrame) -> None:
         """
         Perform fit on the calibration data and save the ECDF, EQF, and weights of the sensitive variable.
 
@@ -52,7 +54,7 @@ class FairWasserstein(BaseHelper):
         y : np.ndarray, shape (n_samples,)
             The calibration labels.
 
-        sensitive_feature : np.ndarray, shape (n_samples,)
+        sensitive_feature : pd.DataFrame, shape (n_samples, 1)
             The calibration samples representing one single sensitive attribute.
 
         Returns
@@ -70,16 +72,18 @@ class FairWasserstein(BaseHelper):
         --------
         >>> wasserstein = FairWasserstein(sigma=0.001)
         >>> y = np.array([0.0, 1.0, 1.0, 0.0])
-        >>> sensitive_feature = np.array([1, 2, 0, 2])
+        >>> sensitive_feature = pd.DataFrame({'nb_child': [1, 2, 0, 2]})
         >>> wasserstein.fit(y, sensitive_feature)
         """
         _check_shape(y, sensitive_feature)
+        _check_unique_mod(sensitive_feature)
 
         self.modalities_calib = self._get_modalities(sensitive_feature)
+        self.columns_calib = sensitive_feature.columns
         self._compute_weights(sensitive_feature)
         self._estimate_ecdf_eqf(y, sensitive_feature, self.sigma)
 
-    def transform(self, y: np.ndarray, sensitive_feature: np.ndarray, epsilon: float = 0) -> np.ndarray:
+    def transform(self, y: np.ndarray, sensitive_feature: pd.DataFrame, epsilon: float = 0) -> np.ndarray:
         """
         Transform the test data to enforce fairness using Wasserstein distance.
 
@@ -88,7 +92,7 @@ class FairWasserstein(BaseHelper):
         y : np.ndarray, shape (n_samples,)
             The target values of the test data.
 
-        sensitive_feature : np.ndarray, shape (n_samples,)
+        sensitive_feature : pd.DataFrame, shape (n_samples, 1)
             The test samples representing a single sensitive attribute.
 
         epsilon : float, optional (default=0)
@@ -117,11 +121,11 @@ class FairWasserstein(BaseHelper):
         Examples
         --------
         >>> y = np.array([0.05, 0.08, 0.9, 0.9, 0.01, 0.88])
-        >>> sensitive_feature = np.array([1, 3, 2, 3, 1, 2])
+        >>> sensitive_feature = pd.DataFrame({'nb_child': [1, 3, 2, 3, 1, 2]})
         >>> wasserstein = FairWasserstein(sigma=0.001)
         >>> wasserstein.fit(y, sensitive_feature)
         >>> y = np.array([0.01, 0.99, 0.98, 0.04])
-        >>> sensitive_feature = np.array([3, 1, 2, 3])
+        >>> sensitive_feature = pd.DataFrame({'nb_child': [3, 1, 2, 3]})
         >>> print(wasserstein.transform(y, sensitive_feature, epsilon=0.2))
         [0.26063673 0.69140959 0.68940959 0.26663673]
         """
@@ -129,7 +133,9 @@ class FairWasserstein(BaseHelper):
         _check_epsilon(epsilon)
         _check_shape(y, sensitive_feature)
         modalities_test = self._get_modalities(sensitive_feature)
+        columns_test = sensitive_feature.columns
         _check_mod(self.modalities_calib, modalities_test)
+        _check_col(self.columns_calib, columns_test)
 
         y_fair = self._fair_y_values(y, sensitive_feature, modalities_test)
         return (1-epsilon)*y_fair + epsilon*y
@@ -180,6 +186,8 @@ class MultiWasserstein():
         self.y_fair = {}
 
         self.modalities_calib_all = {}
+        self.columns_calib_all = None
+
         self.weights_all = {}
 
         self.eqf_all = {}
@@ -187,7 +195,7 @@ class MultiWasserstein():
 
         self.sigma = sigma
 
-    def fit(self, y: np.ndarray, sensitive_features: np.ndarray) -> None:
+    def fit(self, y: np.ndarray, sensitive_features: pd.DataFrame) -> None:
         """
         Perform fit on the calibration data and save the ECDF, EQF, and weights for each sensitive variable.
 
@@ -196,7 +204,7 @@ class MultiWasserstein():
         y : np.ndarray, shape (n_samples,)
             The calibration labels.
 
-        sensitive_features : np.ndarray, shape (n_samples, n_sensitive_features)
+        sensitive_features : pd.DataFrame, shape (n_samples, n_sensitive_features)
             The calibration samples representing multiple sensitive attributes.
 
         Returns
@@ -211,24 +219,22 @@ class MultiWasserstein():
         during the transformation process to ensure fairness in predictions.
         """
         _check_nb_observations(sensitive_features)
+        _check_shape(y, sensitive_features)
+        self.columns_calib_all = sensitive_features.columns
 
-        if sensitive_features.ndim == 1:
-            sensitive_features = np.reshape(
-                sensitive_features, (len(sensitive_features), 1))
-
-        for i, sens in enumerate(sensitive_features.T):
+        for i, col in enumerate(sensitive_features.columns):
+            sens = sensitive_features[[col]]
             wasserstein_instance = FairWasserstein(sigma=self.sigma)
             if i == 0:
                 y_inter = y
-
             wasserstein_instance.fit(y_inter, sens)
-            self.modalities_calib_all[f'sensitive_feature_{i+1}'] = wasserstein_instance.modalities_calib
-            self.weights_all[f'sensitive_feature_{i+1}'] = wasserstein_instance.weights
-            self.eqf_all[f'sensitive_feature_{i+1}'] = wasserstein_instance.eqf
-            self.ecdf_all[f'sensitive_feature_{i+1}'] = wasserstein_instance.ecdf
+            self.modalities_calib_all[col] = wasserstein_instance.modalities_calib
+            self.weights_all[col] = wasserstein_instance.weights
+            self.eqf_all[col] = wasserstein_instance.eqf
+            self.ecdf_all[col] = wasserstein_instance.ecdf
             y_inter = wasserstein_instance.transform(y_inter, sens)
 
-    def transform(self, y: np.ndarray, sensitive_features: np.ndarray, epsilon: Optional[list[float]] = None) -> np.ndarray:
+    def transform(self, y: np.ndarray, sensitive_features: pd.DataFrame, epsilon: Optional[list[float]] = None) -> np.ndarray:
         """
         Transform the test data to enforce fairness using Wasserstein distance.
 
@@ -237,7 +243,7 @@ class MultiWasserstein():
         y : np.ndarray, shape (n_samples,)
             The target values of the test data.
 
-        sensitive_features : np.ndarray shape (n_samples, n_sensitive_features)
+        sensitive_features : pd.DataFrame shape (n_samples, n_sensitive_features)
             The test samples representing multiple sensitive attributes.
 
         epsilon : list, shape (n_sensitive_features,), optional (default=None)
@@ -266,34 +272,49 @@ class MultiWasserstein():
         --------
         >>> wasserstein = MultiWasserStein(sigma=0.001)
         >>> y = np.array([0.6, 0.43, 0.32, 0.8])
-        >>> sensitive_features = np.array([['blue', 5], ['blue', 9], ['green', 5], ['green', 9]])
+        >>> sensitive_features = pd.DataFrame({'color': ['red', 'blue', 'green', 'blue'], 'nb_child': [1, 2, 0, 2]})
         >>> wasserstein.fit(y, sensitive_features)
         >>> y = [0.8, 0.35, 0.23, 0.2]
-        >>> sensitive_features = np.array([['blue', 9], ['blue', 5], ['blue', 5], ['green', 9]])
+        >>> sensitive_features = pd.DataFrame({'color': ['blue', 'blue', 'blue', 'green'], 'nb_child': [3, 2, 1, 2]})
         >>> epsilon = [0.1, 0.2] 
         >>> fair_predictions = wasserstein.transform(y, sensitive_features, epsilon=epsilon)
         >>> print(fair_predictions)
         [0.7015008  0.37444565 0.37204565 0.37144565]
         """
         if epsilon is None:
-            if sensitive_features.ndim == 1:
+            if sensitive_features.shape[1] == 1:
                 epsilon = [0]
             else:
-                epsilon = [0]*np.shape(sensitive_features)[1]
+                epsilon = [0]*sensitive_features.shape[1]
         _check_epsilon_size(epsilon, sensitive_features)
+        _check_col(self.columns_calib_all, sensitive_features.columns)
 
         self.y_fair['Base model'] = y
 
-        for i, sens in enumerate(sensitive_features.T):
+        for i, col in enumerate(sensitive_features.columns):
+            sens = sensitive_features[[col]]
             wasserstein_instance = FairWasserstein(sigma=self.sigma)
             if i == 0:
                 y_inter = y
-            wasserstein_instance.modalities_calib = self.modalities_calib_all[
-                f'sensitive_feature_{i+1}']
-            wasserstein_instance.weights = self.weights_all[f'sensitive_feature_{i+1}']
-            wasserstein_instance.eqf = self.eqf_all[f'sensitive_feature_{i+1}']
-            wasserstein_instance.ecdf = self.ecdf_all[f'sensitive_feature_{i+1}']
+            wasserstein_instance.modalities_calib = self.modalities_calib_all[col]
+            wasserstein_instance.columns_calib = sens.columns
+            wasserstein_instance.weights = self.weights_all[col]
+            wasserstein_instance.eqf = self.eqf_all[col]
+            wasserstein_instance.ecdf = self.ecdf_all[col]
             y_inter = wasserstein_instance.transform(
                 y_inter, sens, epsilon[i])
-            self.y_fair[f'sensitive_feature_{i+1}'] = y_inter
-        return self.y_fair[f'sensitive_feature_{i+1}']
+            self.y_fair[col] = y_inter
+        return self.y_fair[col]
+    
+    def get_sequential_fairness(self) -> dict:
+        """
+        Returns a dictionary containing fair outputs generated at each iteration of the application of the transform method.
+        These outputs represent the predictions for the test data after enforcing fairness at each step.
+
+        Returns
+        -------
+        y_sequential_fair : dict
+            A dictionary containing fair predictions for the test data at each iteration of applying the fairness transformations, regarding one sensitive attribute.
+        """
+        y_sequential_fair = self.y_fair
+        return y_sequential_fair

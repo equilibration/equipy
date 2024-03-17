@@ -1,11 +1,12 @@
 """Calculation of fairness sequentially with respect to all orders of sensitive variables"""
 
 import numpy as np
+import pandas as pd
 
 from ....metrics._fairness_metrics import unfairness_dict
 
 
-def unfairness_permutations(permut_y_fair_dict: dict[tuple, dict[str, np.ndarray]], all_combs_sensitive_features: dict[tuple, np.ndarray]) -> list[dict[str, float]]:
+def unfairness_permutations(permut_y_fair_dict: dict[tuple, dict[str, np.ndarray]], all_combs_sensitive_features: dict[tuple, pd.DataFrame]) -> list[dict[str, float]]:
     """
     Compute unfairness values for multiple fair output datasets and multiple sensitive attribute datasets.
 
@@ -35,5 +36,5 @@ def unfairness_permutations(permut_y_fair_dict: dict[tuple, dict[str, np.ndarray
     unfs_list = []
     for key, value in permut_y_fair_dict.items():
         unfs_list.append(unfairness_dict(
-            value, np.array(all_combs_sensitive_features[key])))
+            value, all_combs_sensitive_features[key]))
     return unfs_list

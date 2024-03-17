@@ -6,6 +6,7 @@ Base class containing all necessary calculations to make predictions fair.
 # License: BSD 3 clause
 from statsmodels.distributions.empirical_distribution import ECDF
 import numpy as np
+import pandas as pd
 from ..metrics._fairness_metrics import EQF
 
 
@@ -33,13 +34,13 @@ class BaseHelper():
 
         self.weights = {}
 
-    def _get_modalities(self, sensitive_feature: np.ndarray) -> set:
+    def _get_modalities(self, sensitive_feature: pd.DataFrame) -> set:
         """
-        Get unique modalities from the input sensitive attribute array.
+        Get unique modalities from the input sensitive attribute DataFrame.
 
         Parameters
         ----------
-        sensitive_feature : array-like, shape (n_samples,)
+        sensitive_feature : pandas DataFrame, shape (n_samples, 1)
             Input samples representing the sensitive attributes.
 
         Returns
@@ -47,15 +48,15 @@ class BaseHelper():
         set
             Set of modalities present in the input sensitive attribute array.
         """
-        return set(sensitive_feature)
+        return set(sensitive_feature.iloc[:, 0])
 
-    def _get_location_modalities(self, sensitive_feature: np.ndarray) -> dict[str, np.ndarray]:
+    def _get_location_modalities(self, sensitive_feature: pd.DataFrame) -> dict[str, np.ndarray]:
         """
         Get the indices of occurrences for each modality in the input sensitive attribute array.
 
         Parameters
         ----------
-        sensitive_feature : np.ndarray, shape (n_samples,)
+        sensitive_feature : pd.DataFrame, shape (n_samples, 1)
             Input sample representing the sensitive attribute.
 
         Returns
@@ -69,13 +70,13 @@ class BaseHelper():
                 sensitive_feature == modality)[0]
         return location_modalities
 
-    def _compute_weights(self, sensitive_feature: np.ndarray) -> dict[str, float]:
+    def _compute_weights(self, sensitive_feature: pd.DataFrame) -> dict[str, float]:
         """
         Calculate weights (probabilities) for each modality based on their occurrences.
 
         Parameters
         ----------
-        sensitive_feature : np.ndarray, shape (n_samples,)
+        sensitive_feature : pd.DataFrame, shape (n_samples, 1)
             Input samples representing the sensitive attribute.
 
         Returns
@@ -89,7 +90,7 @@ class BaseHelper():
                 location_modalities[modality])/len(sensitive_feature)
         return self.weights
 
-    def _estimate_ecdf_eqf(self, y: np.ndarray, sensitive_feature: np.ndarray, sigma: float) -> tuple(dict[str, float]):
+    def _estimate_ecdf_eqf(self, y: np.ndarray, sensitive_feature: pd.DataFrame, sigma: float) -> tuple[dict[str, float]]:
         """
         Estimate ECDF and EQF for each modality, incorporating random noise within [-sigma, sigma].
 
@@ -97,7 +98,7 @@ class BaseHelper():
         ----------
         y : array-like, shape (n_samples,)
             Target values corresponding to the sensitive attribute array.
-        sensitive_feature : np.ndarray, shape (n_samples,)
+        sensitive_feature : pd.DataFrame, shape (n_samples, 1)
             Input samples representing the sensitive attribute.
         sigma : float
             Standard deviation of the random noise added to the data.
@@ -142,7 +143,7 @@ class BaseHelper():
                 self.ecdf[mod](y_with_noise[location_modalities[mod]]))
         return correction
 
-    def _fair_y_values(self, y: np.ndarray, sensitive_feature: np.ndarray, modalities_test: list) -> np.ndarray:
+    def _fair_y_values(self, y: np.ndarray, sensitive_feature: pd.DataFrame, modalities_test: list) -> np.ndarray:
         """
         Apply fairness correction to input values.
 
@@ -150,8 +151,8 @@ class BaseHelper():
         ----------
         y : np.ndarray
             Input values.
-        sensitive_features : np.ndarray, shape (n_samples, n_sensitive_features)
-            The test samples representing multiple sensitive attributes.
+        sensitive_features : pd.DataFrame, shape (n_samples, 1)
+            The test samples representing a single sensitive attribute.
         modalities_test : list
             List of modalities for correction.
 
