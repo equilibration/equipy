@@ -72,7 +72,7 @@ class FairWasserstein(BaseHelper):
         --------
         >>> wasserstein = FairWasserstein(sigma=0.001)
         >>> y = np.array([0.0, 1.0, 1.0, 0.0])
-        >>> sensitive_feature = np.array([1, 2, 0, 2])
+        >>> sensitive_feature = pd.DataFrame({'nb_child': [1, 2, 0, 2]})
         >>> wasserstein.fit(y, sensitive_feature)
         """
         _check_shape(y, sensitive_feature)
@@ -121,11 +121,11 @@ class FairWasserstein(BaseHelper):
         Examples
         --------
         >>> y = np.array([0.05, 0.08, 0.9, 0.9, 0.01, 0.88])
-        >>> sensitive_feature = np.array([1, 3, 2, 3, 1, 2])
+        >>> sensitive_feature = pd.DataFrame({'nb_child': [1, 3, 2, 3, 1, 2]})
         >>> wasserstein = FairWasserstein(sigma=0.001)
         >>> wasserstein.fit(y, sensitive_feature)
         >>> y = np.array([0.01, 0.99, 0.98, 0.04])
-        >>> sensitive_feature = np.array([3, 1, 2, 3])
+        >>> sensitive_feature = pd.DataFrame({'nb_child': [3, 1, 2, 3]})
         >>> print(wasserstein.transform(y, sensitive_feature, epsilon=0.2))
         [0.26063673 0.69140959 0.68940959 0.26663673]
         """
@@ -272,10 +272,10 @@ class MultiWasserstein():
         --------
         >>> wasserstein = MultiWasserStein(sigma=0.001)
         >>> y = np.array([0.6, 0.43, 0.32, 0.8])
-        >>> sensitive_features = np.array([['blue', 5], ['blue', 9], ['green', 5], ['green', 9]])
+        >>> sensitive_features = pd.DataFrame({'color': ['red', 'blue', 'green', 'blue'], 'nb_child': [1, 2, 0, 2]})
         >>> wasserstein.fit(y, sensitive_features)
         >>> y = [0.8, 0.35, 0.23, 0.2]
-        >>> sensitive_features = np.array([['blue', 9], ['blue', 5], ['blue', 5], ['green', 9]])
+        >>> sensitive_features = pd.DataFrame({'color': ['blue', 'blue', 'blue', 'green'], 'nb_child': [3, 2, 1, 2]})
         >>> epsilon = [0.1, 0.2] 
         >>> fair_predictions = wasserstein.transform(y, sensitive_features, epsilon=epsilon)
         >>> print(fair_predictions)

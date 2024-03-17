@@ -160,7 +160,18 @@ def fair_arrow_plot(sensitive_features_calib: pd.DataFrame,
 
     Note
     ----
-    - This function uses a global variable `ax` for plotting, ensuring compatibility with external code.
+    This function uses a global variable `ax` for plotting, ensuring compatibility with external code.
+
+    Examples
+    --------
+    >>> from sklearn.metrics import f1_score
+    >>> sensitive_features_calib = pd.DataFrame({'color': ['red', 'blue', 'green', 'blue'], 'nb_child': [1, 2, 0, 2]})
+    >>> sensitive_features_test = pd.DataFrame({'color': ['blue', 'blue', 'blue', 'green'], 'nb_child': [3, 2, 1, 2]})
+    >>> y_calib = np.array([0.6, 0.43, 0.32, 0.8])
+    >>> y_test = np.array([0.8, 0.35, 0.23, 0.2])
+    >>> y_true_test = np.array(['no', 'no', 'yes', 'no'])
+    >>> fair_arrow_plot(sensitive_features_calib, sensitive_features_test, y_calib, y_test, y_true_test, f1_score, threshold=0.5, positive_class='yes')
+    
     """
     global ax
     global double_current_sens
@@ -257,10 +268,21 @@ def fair_multiple_arrow_plot(sensitive_features_calib: pd.DataFrame,
     -------
     matplotlib.axes.Axes
         Arrows representing the fairness-performance combinations step by step (by sensitive attribute) to reach fairness for different permutations.
-
+    
     Note
     ----
     This function uses a global variable `ax` for plotting, ensuring compatibility with external code.
+
+    Examples
+    --------
+    >>> from sklearn.metrics import f1_score
+    >>> sensitive_features_calib = pd.DataFrame({'color': ['red', 'blue', 'green', 'blue'], 'nb_child': [1, 2, 0, 2]})
+    >>> sensitive_features_test = pd.DataFrame({'color': ['blue', 'blue', 'blue', 'green'], 'nb_child': [3, 2, 1, 2]})
+    >>> y_calib = np.array([0.6, 0.43, 0.32, 0.8])
+    >>> y_test = np.array([0.8, 0.35, 0.23, 0.2])
+    >>> y_true_test = np.array(['no', 'no', 'yes', 'no'])
+    >>> fair_multiple_arrow_plot(sensitive_features_calib, sensitive_features_test, y_calib, y_test, y_true_test, f1_score, threshold=0.5, positive_class='yes')
+
     """
     permut_y_fair_dict = calculate_perm_wasserstein(
         y_calib, sensitive_features_calib, y_test, sensitive_features_test, epsilon=epsilon)

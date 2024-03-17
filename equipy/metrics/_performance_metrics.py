@@ -30,9 +30,10 @@ def performance(y_true: np.ndarray, y_pred: np.ndarray, metric: Callable = mean_
 
     Example
     -------
+    >>> from sklearn.metrics import f1_score
     >>> y_true = np.array([1, 0, 1, 1, 0])
     >>> y_pred = np.array([0, 1, 1, 1, 0])
-    >>> classification_performance = compute_performance(y_true, y_pred)
+    >>> classification_performance = compute_performance(y_true, y_pred, f1_score)
     >>> print(classification_performance)
     0.6
 
@@ -73,10 +74,17 @@ def performance_dict(y_true: np.ndarray, y_fair_dict: dict[str, np.ndarray], met
     Example
     -------
     >>> y_true = np.array([15, 38, 68])
-    >>> y_fair_dict = {'Base model':np.array([19,39,65]), 'sensitive_feature_1':np.array([22,40,50]), 'sensitive_feature_2':np.array([28,39,42])}
-    >>> performance_values = compute_performance_dict(y_true, y_fair_dict)
+    >>> y_fair_dict = {'Base model':np.array([19,39,65]), 'color':np.array([22,40,50]), 'nb_child':np.array([28,39,42])}
+    >>> performance_values = performance_dict(y_true, y_fair_dict)
     >>> print(performance_values)
-    {'Base model': 8.666666666666666, 'sensitive_feature_1': 125.66666666666667, 'sensitive_feature_2': 282.0}
+    {'Base model': 8.666666666666666, 'color': 125.66666666666667, 'nb_child': 282.0}
+
+    >>> from sklearn.metrics import f1_score
+    >>> y_true = np.array(['yes', 'no', 'yes'])
+    >>> y_fair_dict = {'Base model':np.array([0.19,0.39,0.65]), 'color':np.array([0.22,0.40,0.50]), 'nb_child':np.array([0.28,0.39,0.42])}
+    >>> performance_values = performance_dict(y_true, y_fair_dict, f1_score, threshold=0.5, positive_class='yes')
+    >>> print(performance_values)
+    {'Base model': 8.666666666666666, 'color': 125.66666666666667, 'nb_child': 282.0}
     """
     _check_type(y_true, y_fair_dict, threshold=threshold)
     if threshold is not None:

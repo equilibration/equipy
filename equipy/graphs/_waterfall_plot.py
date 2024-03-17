@@ -197,6 +197,17 @@ def fair_waterfall_plot(sensitive_features_calib: np.ndarray,
     The function creates a waterfall plot with bars representing the fairness values at each step.
     If both exact and approximate fairness values are provided, bars are color-coded and labeled accordingly.
     The legend is added to distinguish between different bars in the plot.
+
+    Examples
+    --------
+    >>> from sklearn.metrics import f1_score
+    >>> sensitive_features_calib = pd.DataFrame({'color': ['red', 'blue', 'green', 'blue'], 'nb_child': [1, 2, 0, 2]})
+    >>> sensitive_features_test = pd.DataFrame({'color': ['blue', 'blue', 'blue', 'green'], 'nb_child': [3, 2, 1, 2]})
+    >>> y_calib = np.array([0.6, 0.43, 0.32, 0.8])
+    >>> y_test = np.array([0.8, 0.35, 0.23, 0.2])
+    >>> y_true_test = np.array(['no', 'no', 'yes', 'no'])
+    >>> fair_waterfall_plot(sensitive_features_calib, sensitive_features_test, y_calib, y_test, epsilon=[0, 0.5])
+    
     """
     
     exact_wst = MultiWasserstein()

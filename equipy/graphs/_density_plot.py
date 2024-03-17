@@ -44,15 +44,15 @@ def fair_density_plot(sensitive_features_calib: np.ndarray,
     ValueError
         If the input data is not in the expected format.
 
-    Example
-    -------
-    >>> y = {
-            'Base model': [prediction_values],
-            'sensitive_feature_1': [prediction_values],
-            'sensitive_feature_2': [prediction_values],
-            ...
-        }
-    >>> sensitive_features = [[sensitive_features_of_ind_1_values], [sensitive_feature_of_ind_2_values], ...]
+    Examples
+    --------
+    >>> sensitive_features_calib = pd.DataFrame({'color': ['red', 'blue', 'green', 'blue'], 'nb_child': [1, 2, 0, 2]})
+    >>> sensitive_features_test = pd.DataFrame({'color': ['blue', 'blue', 'blue', 'green'], 'nb_child': [3, 2, 1, 2]})
+    >>> y_calib = np.array([0.6, 0.43, 0.32, 0.8])
+    >>> y_test = np.array([0.8, 0.35, 0.23, 0.2])
+    >>> epsilon = [0, 0.5]
+    >>> fair_density_plot(sensitive_features_calib, sensitive_features_test, scores_calib, scores_test, epsilon)
+    
     """
     
     exact_wst = MultiWasserstein()

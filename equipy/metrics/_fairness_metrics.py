@@ -209,8 +209,8 @@ def unfairness(y: np.ndarray, sensitive_features: pd.DataFrame, n_min: float = 1
     Example
     -------
     >>> y = np.array([5, 0, 6, 7, 9])
-    >>> sensitive_features = np.array([[1, 2, 1, 1, 2], [0, 1, 2, 1, 0]]).T
-    >>> unf = compute_unfairness(y, sensitive_features, n_min=5)
+    >>> sensitive_features = pd.DataFrame({'color': ['red', 'blue', 'green', 'blue'], 'nb_child': [1, 2, 0, 2]})
+    >>> unf = unfairness(y, sensitive_features, n_min=5)
     >>> print(unf)
     6.0
     """
@@ -251,11 +251,11 @@ def unfairness_dict(y_fair_dict: dict[str, np.ndarray], sensitive_features: pd.D
 
     Example
     -------
-    >>> y_fair_dict = {'Base model':np.array([19,39,65]), 'sensitive_feature_1':np.array([22,40,50]), 'sensitive_feature_2':np.array([28,39,42])}
-    >>> sensitive_features = np.array([['blue', 2], ['red', 9], ['green', 5]])
-    >>> unfs_dict = compute_unfairness_multi(y_fair_dict, sensitive_features, n_min=5)
+    >>> y_fair_dict = {'Base model':np.array([19,39,65]), 'color':np.array([22,40,50]), 'nb_child':np.array([28,39,42])}
+    >>> sensitive_features = pd.DataFrame({'color': ['red', 'blue', 'green', 'blue'], 'nb_child': [1, 2, 0, 2]})
+    >>> unfs_dict = unfairness_dict(y_fair_dict, sensitive_features, n_min=5)
     >>> print(unfs_dict)
-    {'sensitive_feature_0': 46.0, 'sensitive_feature_1': 28.0, 'sensitive_feature_2': 14.0}
+    {'Base model': 46.0, 'color': 28.0, 'nb_child': 14.0}
     """
     unfairness_dict = {}
     for key, y_fair in y_fair_dict.items():
