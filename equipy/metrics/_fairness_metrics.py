@@ -1,5 +1,6 @@
 """
-Computation of the fairness (i.e. measurement of the similarity in prediction distribution between different population groups according to their sensitive attributes).
+Computation of the fairness (i.e. measurement of the similarity in prediction distribution between
+different population groups according to their sensitive attributes).
 """
 
 # Authors: Agathe F, Suzie G, Francois H, Philipp R, Arthur C
@@ -8,19 +9,19 @@ import numpy as np
 import warnings
 from scipy.interpolate import interp1d
 import numpy as np
-import ot
 from typing import Union
 import pandas as pd
 
-# WARNING:You cannot calculate the EQF function of a single value : this means that if only one individual
-# has a specific sensitive value, you cannot use the transform function.
+# WARNING:You cannot calculate the EQF function of a single value : this means that if
+# only one individual has a specific sensitive value, you cannot use the transform function.
 
 
 class EQF:
     """
     Empirical Quantile Function (EQF) Class.
 
-    This class computes the linear interpolation of the empirical quantile function for a given set of sample data.
+    This class computes the linear interpolation of the empirical quantile function for a given set
+    of sample data.
 
     Parameters
     ----------
@@ -136,11 +137,14 @@ class EQF:
                 raise ValueError('Error with input value')
 
 
-def diff_quantile(data1: np.ndarray, data2: np.ndarray, n_min: float = 1000) -> float:
+def diff_quantile(data1: np.ndarray,
+                  data2: np.ndarray,
+                  approximate=True) -> float:
     """
-    Compute the unfairness between two populations based on their quantile functions. 
-    If the number of points in data1 is less than n_min, compute the Wasserstein distance using the POT package. 
-    Otherwise, determine unfairness as the maximum difference in quantiles between the two populations.
+    Compute the unfairness between two populations based on their quantile functions. If the option
+    approximate is set to False, compute the compute the Wasserstein distance using the POT package 
+    which requires an install. Else, determine unfairness as the maximum difference in quantiles
+    between the two populations.
 
     Parameters
     ----------
@@ -148,8 +152,8 @@ def diff_quantile(data1: np.ndarray, data2: np.ndarray, n_min: float = 1000) -> 
         The first set of data points.
     data2 : np.ndarray
         The second set of data points.
-    n_min : float
-        Below this threshold, compute the Wasserstein distance.
+    approximate : bool
+        if False, compute distance using optimal transport map, else use quantile approximation
 
     Returns
     -------
@@ -164,11 +168,23 @@ def diff_quantile(data1: np.ndarray, data2: np.ndarray, n_min: float = 1000) -> 
     >>> print(diff)
     3.9797979797979797
     """
+    if approximate:
+        probs = np.linspace(0.01, 0.99, num=100)
+        eqf1 = np.quantile(data1, probs)
+        eqf2 = np.quantile(data2, probs)
+        unfair_value = np.max(np.abs(eqf1-eqf2))
+    else:
+        try:
+            import ot
+        except ModuleNotFoundError:
+            print('POT not installed, install before using'\
+                  'approximate=False option')
+        except Exception as e:
+            print(f"Unexpected {e=}, {type(e)=}")
+            raise
 
-    n1 = len(data1)  # data1 corresponds to y
-    n2 = len(data2)
-
-    if n1 < n_min:
+        n1 = len(data1)  # data1 corresponds to y
+        n2 = len(data2)
         # weights of each point of the two distributions
         a, b = np.ones((n1,)) / n1, np.ones((n2,)) / n2
         M = ot.dist(data1.reshape((n1, 1)), data2.reshape((n2, 1)),
@@ -176,21 +192,16 @@ def diff_quantile(data1: np.ndarray, data2: np.ndarray, n_min: float = 1000) -> 
         M = M/M.max()
         unfair_value = ot.emd2(a, b, M)
 
-    else:
-        probs = np.linspace(0.01, 0.99, num=100)
-        eqf1 = np.quantile(data1, probs)
-        eqf2 = np.quantile(data2, probs)
-        unfair_value = np.max(np.abs(eqf1-eqf2))
-
     return unfair_value
 
 
 def unfairness(y: np.ndarray, sensitive_features: pd.DataFrame, n_min: float = 1000) -> float:
     """
-    Compute the unfairness value for a given fair output (y) and multiple sensitive attributes data (sensitive_features) containing several modalities.
-    If there is a single sensitive feature, it calculates the maximum quantile difference between different modalities of that single sensitive feature.
-    If there are multiple sensitive features, it calculates the maximum quantile difference for each sensitive feature
-    and then takes the sum of these maximums.
+    Compute the unfairness value for a given fair output (y) and multiple sensitive attributes data
+    (sensitive_features) containing several modalities. If there is a single sensitive feature,
+    it calculates the maximum quantile difference between different modalities of that single
+    sensitive feature. If there are multiple sensitive features, it calculates the maximum quantile
+    difference for each sensitive feature and then takes the sum of these maximums.
 
     Parameters
     ----------
@@ -209,7 +220,8 @@ def unfairness(y: np.ndarray, sensitive_features: pd.DataFrame, n_min: float = 1
     Example
     -------
     >>> y = np.array([5, 0, 6, 7, 9])
-    >>> sensitive_features = pd.DataFrame({'color': ['red', 'blue', 'green', 'blue'], 'nb_child': [1, 2, 0, 2]})
+    >>> sensitive_features = pd.DataFrame({'color': ['red', 'blue', 'green', 'blue'],
+                                           'nb_child': [1, 2, 0, 2]})
     >>> unf = unfairness(y, sensitive_features, n_min=5)
     >>> print(unf)
     6.0
@@ -227,9 +239,12 @@ def unfairness(y: np.ndarray, sensitive_features: pd.DataFrame, n_min: float = 1
     return unfs
 
 
-def unfairness_dict(y_fair_dict: dict[str, np.ndarray], sensitive_features: pd.DataFrame, n_min: float = 1000) -> dict[str, float]:
+def unfairness_dict(y_fair_dict: dict[str, np.ndarray],
+                    sensitive_features: pd.DataFrame,
+                    n_min: float = 1000) -> dict[str, float]:
     """
-    Compute unfairness values for sequentially fair output datasets and multiple sensitive attributes datasets.
+    Compute unfairness values for sequentially fair output datasets and multiple sensitive
+    attributes datasets.
 
     Parameters
     ----------
@@ -247,12 +262,15 @@ def unfairness_dict(y_fair_dict: dict[str, np.ndarray], sensitive_features: pd.D
     -------
     dict
         A dictionary containing unfairness values for each level of fairness.
-        The level of fairness corresponds to the number of sensitive attributes to which fairness has been applied.
+        The level of fairness corresponds to the number of sensitive attributes to which 
+        fairness has been applied.
 
     Example
     -------
-    >>> y_fair_dict = {'Base model':np.array([19,39,65]), 'color':np.array([22,40,50]), 'nb_child':np.array([28,39,42])}
-    >>> sensitive_features = pd.DataFrame({'color': ['red', 'blue', 'green', 'blue'], 'nb_child': [1, 2, 0, 2]})
+    >>> y_fair_dict = {'Base model':np.array([19,39,65]), 'color':np.array([22,40,50]),
+                       'nb_child':np.array([28,39,42])}
+    >>> sensitive_features = pd.DataFrame({'color': ['red', 'blue', 'green', 'blue'],
+                                           'nb_child': [1, 2, 0, 2]})
     >>> unfs_dict = unfairness_dict(y_fair_dict, sensitive_features, n_min=5)
     >>> print(unfs_dict)
     {'Base model': 46.0, 'color': 28.0, 'nb_child': 14.0}

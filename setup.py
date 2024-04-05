@@ -1,10 +1,14 @@
 from setuptools import setup, find_packages
+import json 
 
-VERSION = "0.0.3-alpha-dev" 
-DESCRIPTION = "Equipy is a tool for fast, online fairness calibration"
+with open("versioning/minor_build.json", "r") as f:
+    minor_version = json.load()
 
 with open("README.rst", "r") as f:
     long_description = f.read()
+
+VERSION = f"0.0.{minor_version['buildNumber']}-alpha-dev" 
+DESCRIPTION = "Equipy is a tool for fast, online fairness calibration"
 LONG_DESCRIPTION = long_description
 
 setup(
@@ -17,7 +21,7 @@ setup(
         packages=find_packages(include=["equipy", "equipy.*"]),
         install_requires=["numpy", "scipy", "scikit-learn",
                           "matplotlib", "pandas", "statsmodels",
-                          "seaborn", "POT"], 
+                          "seaborn"], 
         setup_requires=["pytest-runner"],
         tests_require=["pytest"],
         keywords=["fairness", "wasserstein"],

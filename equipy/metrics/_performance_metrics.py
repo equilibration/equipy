@@ -21,7 +21,8 @@ def performance(y_true: np.ndarray, y_pred: np.ndarray, metric: Callable = mean_
     y_pred : np.ndarray
         Predicted (fair or not) output values. 
     metric : Callable, (default=mean_squared_error)
-        The metric used to compute the performance, which expects y_true then y_pred, default=sklearn.metrics.mean_square_error.
+        The metric used to compute the performance, which expects y_true then y_pred,
+        default=sklearn.metrics.mean_square_error.
 
     Returns
     -------
@@ -49,7 +50,11 @@ def performance(y_true: np.ndarray, y_pred: np.ndarray, metric: Callable = mean_
     return metric(y_true, y_pred)
 
 
-def performance_dict(y_true: np.ndarray, y_fair_dict: dict[str, np.ndarray], metric: Callable = mean_squared_error, threshold: Optional[float] = None, positive_class: Union[int, str] = 1) -> dict[str, float]:
+def performance_dict(y_true: np.ndarray,
+                     y_fair_dict: dict[str, np.ndarray],
+                     metric: Callable = mean_squared_error,
+                     threshold: Optional[float] = None,
+                     positive_class: Union[int, str] = 1) -> dict[str, float]:
     """
     Compute the performance values for multiple fair output datasets compared to the true events.
 
@@ -62,9 +67,11 @@ def performance_dict(y_true: np.ndarray, y_fair_dict: dict[str, np.ndarray], met
     metric : Callable, optional
         The metric used to compute the performance, default=sklearn.metrics.mean_square_error.
     threshold : float, default = None
-        In the case of classification, the threshold used to transform scores from binary classification into labels for evaluation of performance.
+        In the case of classification, the threshold used to transform scores from binary
+        classification into labels for evaluation of performance.
     positive_class : int or str, optional, default=1
-        In the case of classification, the positive class label used for applying threshold of binary classification. Can be either an integer or a string.
+        In the case of classification, the positive class label used for applying threshold of
+        binary classification. Can be either an integer or a string.
 
     Returns
     -------
@@ -74,15 +81,18 @@ def performance_dict(y_true: np.ndarray, y_fair_dict: dict[str, np.ndarray], met
     Example
     -------
     >>> y_true = np.array([15, 38, 68])
-    >>> y_fair_dict = {'Base model':np.array([19,39,65]), 'color':np.array([22,40,50]), 'nb_child':np.array([28,39,42])}
+    >>> y_fair_dict = {'Base model':np.array([19,39,65]), 'color':np.array([22,40,50]),
+                        'nb_child':np.array([28,39,42])}
     >>> performance_values = performance_dict(y_true, y_fair_dict)
     >>> print(performance_values)
     {'Base model': 8.666666666666666, 'color': 125.66666666666667, 'nb_child': 282.0}
 
     >>> from sklearn.metrics import f1_score
     >>> y_true = np.array(['yes', 'no', 'yes'])
-    >>> y_fair_dict = {'Base model':np.array([0.19,0.39,0.65]), 'color':np.array([0.22,0.40,0.50]), 'nb_child':np.array([0.28,0.39,0.42])}
-    >>> performance_values = performance_dict(y_true, y_fair_dict, f1_score, threshold=0.5, positive_class='yes')
+    >>> y_fair_dict = {'Base model':np.array([0.19,0.39,0.65]), 'color':np.array([0.22,0.40,0.50]),
+                                            'nb_child':np.array([0.28,0.39,0.42])}
+    >>> performance_values = performance_dict(y_true, y_fair_dict, f1_score, threshold=0.5,
+                                              positive_class='yes')
     >>> print(performance_values)
     {'Base model': 8.666666666666666, 'color': 125.66666666666667, 'nb_child': 282.0}
     """
