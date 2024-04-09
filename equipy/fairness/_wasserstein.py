@@ -139,6 +139,60 @@ class FairWasserstein(BaseHelper):
 
         y_fair = self._fair_y_values(y, sensitive_feature, modalities_test)
         return (1-epsilon)*y_fair + epsilon*y
+    
+    def fit_transform(self, y_calib: np.ndarray, sensitive_feature_calib:pd.DataFrame, y_test:np.ndarray, sensitive_feature_test:pd.DataFrame, epsilon:float= 0) -> np.ndarray:
+        """
+        Fit and transform the calibration and test data to enforce fairness using Wasserstein distance.
+
+        Parameters
+        ----------
+        y_calib : np.ndarray, shape (n_samples,)
+            The target values of the calibration data.
+
+        sensitive_feature_calib : pd.DataFrame, shape (n_samples, 1)
+            The calibration samples representing a single sensitive attribute.
+
+        y_test : np.ndarray, shape (n_samples,)
+            The target values of the test data.
+
+        sensitive_feature_test : pd.DataFrame, shape (n_samples, 1)
+            The test samples representing a single sensitive attribute.
+
+        epsilon : float, optional (default=0)
+            The fairness parameter controlling the trade-off between fairness and accuracy.
+            It represents the fraction of the original predictions retained after fairness adjustment.
+            Epsilon should be a value between 0 and 1, where 0 means full fairness and 1 means no fairness constraint.
+
+        Returns
+        -------
+        y_fair : np.ndarray, shape (n_samples,)
+            Fair predictions for the test data after enforcing fairness constraints.
+
+        Notes
+        -----
+        This method applies Wasserstein distance-based fairness adjustment to the test data
+        using the precomputed ECDF (Empirical Cumulative Distribution Function),
+        EQF (Empirical Quantile Function), and weights obtained from the calibration data.
+        Random noise within the range of [-sigma, sigma] is added to the test data to ensure fairness.
+        The parameter epsilon controls the trade-off between fairness and accuracy,
+        with 0 enforcing full fairness and 1 retaining the original predictions.
+
+        References
+        ----------
+        Evgenii Chzhen, Christophe Denis, Mohamed Hebiri, Luca Oneto and Massimiliano Pontil, "Fair Regression with Wasserstein Barycenters" (NeurIPS20)
+
+        Examples
+        --------
+        >>> y_calib = np.array([0.05, 0.08, 0.9, 0.9, 0.01, 0.88])
+        >>> sensitive_feature_calib = pd.DataFrame({'nb_child': [1, 3, 2, 3, 1, 2]})
+        >>> y_test = np.array([0.01, 0.99, 0.98, 0.04])
+        >>> sensitive_feature_test = pd.DataFrame({'nb_child': [3, 1, 2, 3]})
+        >>> wasserstein = FairWasserstein(sigma=0.001)
+        >>> print(wasserstein.fit_transform(y_calib, sensitive_feature_calib, y_test, sensitive_feature_test, epsilon=0.2))
+        [0.26063673 0.69140959 0.68940959 0.26663673]
+        """
+        self.fit(y_calib, sensitive_feature_calib)
+        return self.transform(y_test, sensitive_feature_test, epsilon)
 
 
 class MultiWasserstein():
@@ -236,7 +290,7 @@ class MultiWasserstein():
 
     def transform(self, y: np.ndarray, sensitive_features: pd.DataFrame, epsilon: Optional[list[float]] = None) -> np.ndarray:
         """
-        Transform the test data to enforce fairness using Wasserstein distance.
+        Transform the calib and test data to enforce fairness using Wasserstein distance.
 
         Parameters
         ----------
@@ -274,12 +328,12 @@ class MultiWasserstein():
         >>> y = np.array([0.6, 0.43, 0.32, 0.8])
         >>> sensitive_features = pd.DataFrame({'color': ['red', 'blue', 'green', 'blue'], 'nb_child': [1, 2, 0, 2]})
         >>> wasserstein.fit(y, sensitive_features)
-        >>> y = [0.8, 0.35, 0.23, 0.2]
-        >>> sensitive_features = pd.DataFrame({'color': ['blue', 'blue', 'blue', 'green'], 'nb_child': [3, 2, 1, 2]})
+        >>> y = np.array([0.8, 0.35, 0.23, 0.2])
+        >>> sensitive_features = pd.DataFrame({'color': ['blue', 'blue', 'blue', 'green'], 'nb_child': [2, 2, 1, 2]})
         >>> epsilon = [0.1, 0.2] 
         >>> fair_predictions = wasserstein.transform(y, sensitive_features, epsilon=epsilon)
         >>> print(fair_predictions)
-        [0.7015008  0.37444565 0.37204565 0.37144565]
+        [0.42483123 0.36412012 0.36172012 0.36112012]
         """
         if epsilon is None:
             if sensitive_features.shape[1] == 1:
@@ -306,6 +360,60 @@ class MultiWasserstein():
             self.y_fair[col] = y_inter
         return self.y_fair[col]
     
+    def fit_transform(self, y_calib:np.ndarray, sensitive_features_calib:pd.DataFrame, y_test:np.ndarray, sensitive_features_test:pd.DataFrame,epsilon: Optional[list[float]] = None)->np.array:
+        """
+        Fit and transform the calibration and test data to enforce fairness using Wasserstein distance.
+
+        Parameters
+        ----------
+        y_calib : np.ndarray, shape (n_samples,)
+            The calibration labels.
+
+        sensitive_features_calub : pd.DataFrame, shape (n_samples, n_sensitive_features)
+            The calibration samples representing multiple sensitive attributes.
+
+        y_test : np.ndarray, shape (n_samples,)
+            The target values of the test data.
+
+        sensitive_features_test : pd.DataFrame shape (n_samples, n_sensitive_features)
+            The test samples representing multiple sensitive attributes.
+
+        epsilon : list, shape (n_sensitive_features,), optional (default=None)
+            The fairness parameters controlling the trade-off between fairness and accuracy
+            for each sensitive feature. If None, no fairness constraints are applied.
+
+        Returns
+        -------
+        y_fair : np.ndarray, shape (n_samples,)
+            Fair predictions for the test data after enforcing fairness constraints.
+
+        Notes
+        -----
+        This method applies Wasserstein distance-based fairness adjustment to the test data
+        using the precomputed ECDF (Empirical Cumulative Distribution Function),
+        EQF (Empirical Quantile Function), and weights obtained from the calibration data.
+        Random noise within the range of [-sigma, sigma] is added to the test data to ensure fairness.
+        The parameter epsilon is a list, where each element controls the trade-off between fairness and accuracy
+        for the corresponding sensitive feature.
+
+        References
+        ----------
+        François Hu, Philipp Ratz, Arthur Charpentier, "A Sequentially Fair Mechanism for Multiple Sensitive Attributes" (AAAI24)
+
+        Examples
+        --------
+        >>> wasserstein = MultiWasserStein(sigma=0.001)
+        >>> y_calib = np.array([0.6, 0.43, 0.32, 0.8])
+        >>> sensitive_features_calib = pd.DataFrame({'color': ['red', 'blue', 'green', 'blue'], 'nb_child': [1, 2, 0, 2]})
+        >>> y_test = [0.8, 0.35, 0.23, 0.2]
+        >>> sensitive_features_test = pd.DataFrame({'color': ['blue', 'blue', 'blue', 'green'], 'nb_child': [2, 2, 1, 2]})
+        >>> epsilon = [0.1, 0.2] 
+        >>> print(wasserstein.fit_transform(y_calib, sensitive_features_calib, y_test, sensitive_features_test, epsilon))
+        [0.42483123 0.36412012 0.36172012 0.36112012]
+        """
+        self.fit(y_calib, sensitive_features_calib)
+        return self.transform(y_test, sensitive_features_test, epsilon)
+
     def get_sequential_fairness(self) -> dict:
         """
         Returns a dictionary containing fair outputs generated at each iteration of the application of the transform method.
