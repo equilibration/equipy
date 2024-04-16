@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 import json 
 
 with open("versioning/minor_build.json", "r") as f:
-    minor_version = json.load()
+    minor_version = json.load(f)
 
 with open("README.rst", "r") as f:
     long_description = f.read()
