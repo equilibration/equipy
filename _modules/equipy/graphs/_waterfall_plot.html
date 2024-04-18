@@ -254,6 +254,8 @@ document.write(`
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">from</span> <span class="nn">..metrics._fairness_metrics</span> <span class="kn">import</span> <span class="n">unfairness_dict</span>
+<span class="kn">from</span> <span class="nn">..fairness._wasserstein</span> <span class="kn">import</span> <span class="n">MultiWasserstein</span>
 
 
 <span class="k">def</span> <span class="nf">_set_colors</span><span class="p">(</span><span class="n">substraction_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
@@ -409,17 +411,27 @@ document.write(`
     <span class="n">distance</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span> <span class="o">+</span> <span class="p">[</span><span class="o">-</span><span class="n">values</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span>
     <span class="k">return</span> <span class="n">distance</span>
 
-
-<div class="viewcode-block" id="fair_waterfall_plot"><a class="viewcode-back" href="../../../equipy.graphs.html#equipy.graphs.fair_waterfall_plot">[docs]</a><span class="k">def</span> <span class="nf">fair_waterfall_plot</span><span class="p">(</span><span class="n">unfs_exact</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span> <span class="n">unfs_approx</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">plt</span><span class="o">.</span><span class="n">Axes</span><span class="p">:</span>
+<div class="viewcode-block" id="fair_waterfall_plot"><a class="viewcode-back" href="../../../equipy.graphs.html#equipy.graphs.fair_waterfall_plot">[docs]</a><span class="k">def</span> <span class="nf">fair_waterfall_plot</span><span class="p">(</span><span class="n">sensitive_features_calib</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+                        <span class="n">sensitive_features_test</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+                        <span class="n">y_calib</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+                        <span class="n">y_test</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+                        <span class="n">epsilon</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+                        <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">plt</span><span class="o">.</span><span class="n">Axes</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Generate a waterfall plot illustrating the sequential fairness in a model.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    unfs_exact : dict</span>
-<span class="sd">        Dictionary containing fairness values for each step in the exact fairness scenario.</span>
-<span class="sd">    unfs_approx : dict, optional</span>
-<span class="sd">        Dictionary containing fairness values for each step in the approximate fairness scenario. Default is None.</span>
+<span class="sd">    sensitive_features_calib : numpy.ndarray</span>
+<span class="sd">        Sensitive features for calibration.</span>
+<span class="sd">    sensitive_features_test : numpy.ndarray</span>
+<span class="sd">        Sensitive features for testing.</span>
+<span class="sd">    y_calib : numpy.ndarray</span>
+<span class="sd">        Predictions for calibration.</span>
+<span class="sd">    y_test : numpy.ndarray</span>
+<span class="sd">        Predictions for testing.</span>
+<span class="sd">    epsilon : float, optional, default = None</span>
+<span class="sd">        Epsilon value for calculating Wasserstein distance</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -431,22 +443,42 @@ document.write(`
 <span class="sd">    The function creates a waterfall plot with bars representing the fairness values at each step.</span>
 <span class="sd">    If both exact and approximate fairness values are provided, bars are color-coded and labeled accordingly.</span>
 <span class="sd">    The legend is added to distinguish between different bars in the plot.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
 
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; from sklearn.metrics import f1_score</span>
+<span class="sd">    &gt;&gt;&gt; sensitive_features_calib = pd.DataFrame({&#39;color&#39;: [&#39;red&#39;, &#39;blue&#39;, &#39;green&#39;, &#39;blue&#39;], &#39;nb_child&#39;: [1, 2, 0, 2]})</span>
+<span class="sd">    &gt;&gt;&gt; sensitive_features_test = pd.DataFrame({&#39;color&#39;: [&#39;blue&#39;, &#39;blue&#39;, &#39;blue&#39;, &#39;green&#39;], &#39;nb_child&#39;: [3, 2, 1, 2]})</span>
+<span class="sd">    &gt;&gt;&gt; y_calib = np.array([0.6, 0.43, 0.32, 0.8])</span>
+<span class="sd">    &gt;&gt;&gt; y_test = np.array([0.8, 0.35, 0.23, 0.2])</span>
+<span class="sd">    &gt;&gt;&gt; y_true_test = np.array([&#39;no&#39;, &#39;no&#39;, &#39;yes&#39;, &#39;no&#39;])</span>
+<span class="sd">    &gt;&gt;&gt; fair_waterfall_plot(sensitive_features_calib, sensitive_features_test, y_calib, y_test, epsilon=[0, 0.5])</span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="n">exact_wst</span> <span class="o">=</span> <span class="n">MultiWasserstein</span><span class="p">()</span>
+    <span class="n">exact_wst</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">y_calib</span><span class="p">,</span> <span class="n">sensitive_features_calib</span><span class="p">)</span>
+    <span class="n">y_final_fair</span> <span class="o">=</span> <span class="n">exact_wst</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">sensitive_features_test</span><span class="p">)</span>
+    <span class="n">y_sequential_fair</span> <span class="o">=</span> <span class="n">exact_wst</span><span class="o">.</span><span class="n">get_sequential_fairness</span><span class="p">()</span>
+    <span class="n">init_unfs_exact</span> <span class="o">=</span> <span class="n">unfairness_dict</span><span class="p">(</span><span class="n">y_sequential_fair</span><span class="p">,</span> <span class="n">sensitive_features_test</span><span class="p">)</span>
+    <span class="n">unfs_exact</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">init_unfs_exact</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+    <span class="n">unfs_approx</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">if</span> <span class="n">epsilon</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">approx_wst</span> <span class="o">=</span> <span class="n">MultiWasserstein</span><span class="p">()</span>
+        <span class="n">approx_wst</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">y_calib</span><span class="p">,</span> <span class="n">sensitive_features_calib</span><span class="p">)</span>
+        <span class="n">approx_y_final_fair</span> <span class="o">=</span> <span class="n">approx_wst</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">sensitive_features_test</span><span class="p">,</span> <span class="n">epsilon</span><span class="o">=</span><span class="n">epsilon</span><span class="p">)</span>
+        <span class="n">approx_y_sequential_fair</span> <span class="o">=</span> <span class="n">approx_wst</span><span class="o">.</span><span class="n">get_sequential_fairness</span><span class="p">()</span>
+        <span class="n">init_unfs_approx</span> <span class="o">=</span> <span class="n">unfairness_dict</span><span class="p">(</span><span class="n">approx_y_sequential_fair</span><span class="p">,</span> <span class="n">sensitive_features_test</span><span class="p">)</span>
+        <span class="n">unfs_approx</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">init_unfs_approx</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+    
     <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
 
-    
-    <span class="n">sens</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\d+&#39;</span><span class="p">,</span> <span class="n">key</span><span class="p">)))</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">unfs_exact</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="mi">1</span><span class="p">:]]</span>
+    <span class="n">sens</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">unfs_exact</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
 
     <span class="n">labels</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">unfs_exact</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="mi">1</span><span class="p">:])):</span>
-        <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> 
-            <span class="n">labels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;$A_</span><span class="si">{</span><span class="n">sens</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="s2">$-fair&quot;</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">i</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">unfs_exact</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="mi">1</span><span class="p">:])</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span> 
-            <span class="n">labels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;$A_</span><span class="si">{</span><span class="mi">1</span><span class="si">}</span><span class="s2">$&quot;</span> <span class="o">+</span> <span class="sa">r</span><span class="s2">&quot;$_:$&quot;</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;$_</span><span class="si">{</span><span class="n">sens</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="s2">$-fair&quot;</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">labels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;$A_</span><span class="se">{{</span><span class="si">{</span><span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span><span class="w"> </span><span class="n">sens</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]))</span><span class="si">}</span><span class="se">}}</span><span class="s2">$-fair&quot;</span><span class="p">)</span>
 
+    <span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span> <span class="o">+</span> <span class="s1">&#39;-fair&#39;</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">sens</span><span class="p">[</span><span class="mi">1</span><span class="p">:]]</span>
     <span class="n">leg</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Base model&#39;</span><span class="p">,)</span> <span class="o">+</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="s1">&#39;Final model&#39;</span><span class="p">,)</span>
     <span class="n">base_exact</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">unfs_exact</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
     <span class="n">values_exact</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">base_exact</span>
@@ -498,12 +530,15 @@ document.write(`
                     <span class="k">if</span> <span class="n">unfs_approx</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">base_approx</span><span class="p">),</span> <span class="n">pps</span><span class="p">,</span> <span class="n">ax</span><span class="p">)</span>
     <span class="n">_add_doted_points</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">base_exact</span><span class="p">)</span>
                       <span class="k">if</span> <span class="n">unfs_approx</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">base_approx</span><span class="p">))</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Unfairness in $A_</span><span class="si">{</span><span class="nb">tuple</span><span class="p">(</span><span class="n">unfs_exact</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s1">$&#39;</span><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1.1</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Total unfairness&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">base_exact</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="n">base_exact</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="mi">10</span><span class="p">)</span>
+    <span class="c1">#ax.set_title(</span>
+    <span class="c1">#    f&#39;Sequential ({&quot;exact&quot; if unfs_approx is None else &quot;approximate&quot;}) fairness: $A_{tuple(unfs_exact.keys())[-1][-1]}$ result&#39;)</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span>
-        <span class="sa">f</span><span class="s1">&#39;Sequential (</span><span class="si">{</span><span class="s2">&quot;exact&quot;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">unfs_approx</span><span class="w"> </span><span class="ow">is</span><span class="w"> </span><span class="kc">None</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s2">&quot;approximate&quot;</span><span class="si">}</span><span class="s1">) fairness: $A_</span><span class="si">{</span><span class="nb">tuple</span><span class="p">(</span><span class="n">unfs_exact</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s1">$ result&#39;</span><span class="p">)</span>
+        <span class="sa">f</span><span class="s1">&#39;Sequential (</span><span class="si">{</span><span class="s2">&quot;exact&quot;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">unfs_approx</span><span class="w"> </span><span class="ow">is</span><span class="w"> </span><span class="kc">None</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s2">&quot;approximate&quot;</span><span class="si">}</span><span class="s1">) fairness&#39;</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">ax</span></div>
+
 </pre></div>
 
                 </article>

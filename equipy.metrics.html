@@ -321,7 +321,8 @@ document.write(`
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>y_true</strong> (<em>np.ndarray</em>) – Actual values.</p></li>
 <li><p><strong>y_pred</strong> (<em>np.ndarray</em>) – Predicted (fair or not) output values.</p></li>
-<li><p><strong>metric</strong> (<em>Callable</em><em>, </em><em>(</em><em>default=mean_squared_error</em><em>)</em>) – The metric used to compute the performance, which expects y_true then y_pred, default=sklearn.metrics.mean_square_error.</p></li>
+<li><p><strong>metric</strong> (<em>Callable</em><em>, </em><em>(</em><em>default=mean_squared_error</em><em>)</em>) – The metric used to compute the performance, which expects y_true then y_pred,
+default=sklearn.metrics.mean_square_error.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -332,9 +333,10 @@ document.write(`
 </dd>
 </dl>
 <p class="rubric">Example</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">y_true</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">f1_score</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y_true</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">y_pred</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">classification_performance</span> <span class="o">=</span> <span class="n">compute_performance</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">classification_performance</span> <span class="o">=</span> <span class="n">compute_performance</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">,</span> <span class="n">f1_score</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">classification_performance</span><span class="p">)</span>
 <span class="go">0.6</span>
 </pre></div>
@@ -350,16 +352,17 @@ document.write(`
 
 <dl class="py function">
 <dt class="sig sig-object py" id="equipy.metrics.unfairness">
-<span class="sig-prename descclassname"><span class="pre">equipy.metrics.</span></span><span class="sig-name descname"><span class="pre">unfairness</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sensitive_features</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_min</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1000</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="_modules/equipy/metrics/_fairness_metrics.html#unfairness"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#equipy.metrics.unfairness" title="Permalink to this definition">#</a></dt>
-<dd><p>Compute the unfairness value for a given fair output (y) and multiple sensitive attributes data (sensitive_features) containing several modalities.
-If there is a single sensitive feature, it calculates the maximum quantile difference between different modalities of that single sensitive feature.
-If there are multiple sensitive features, it calculates the maximum quantile difference for each sensitive feature
-and then takes the maximum of these maximums.</p>
+<span class="sig-prename descclassname"><span class="pre">equipy.metrics.</span></span><span class="sig-name descname"><span class="pre">unfairness</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sensitive_features</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_min</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1000</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="_modules/equipy/metrics/_fairness_metrics.html#unfairness"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#equipy.metrics.unfairness" title="Permalink to this definition">#</a></dt>
+<dd><p>Compute the unfairness value for a given fair output (y) and multiple sensitive attributes data
+(sensitive_features) containing several modalities. If there is a single sensitive feature,
+it calculates the maximum quantile difference between different modalities of that single
+sensitive feature. If there are multiple sensitive features, it calculates the maximum quantile
+difference for each sensitive feature and then takes the sum of these maximums.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>y</strong> (<em>np.ndarray</em>) – Predicted (fair or not) output data.</p></li>
-<li><p><strong>sensitive_features</strong> (<em>np.ndarray</em>) – Sensitive attribute data.</p></li>
+<li><p><strong>sensitive_features</strong> (<em>pd.DataFrame</em>) – Sensitive attribute data.</p></li>
 <li><p><strong>n_min</strong> (<em>float</em>) – Below this threshold, compute the unfairness based on the Wasserstein distance.</p></li>
 </ul>
 </dd>
@@ -372,8 +375,9 @@ and then takes the maximum of these maximums.</p>
 </dl>
 <p class="rubric">Example</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">5</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">9</span><span class="p">])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">sensitive_features</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]])</span><span class="o">.</span><span class="n">T</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">unf</span> <span class="o">=</span> <span class="n">compute_unfairness</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">sensitive_features</span><span class="p">,</span> <span class="n">n_min</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sensitive_features</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;color&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="s1">&#39;blue&#39;</span><span class="p">,</span> <span class="s1">&#39;green&#39;</span><span class="p">,</span> <span class="s1">&#39;blue&#39;</span><span class="p">],</span>
+<span class="go">                                       &#39;nb_child&#39;: [1, 2, 0, 2]})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">unf</span> <span class="o">=</span> <span class="n">unfairness</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">sensitive_features</span><span class="p">,</span> <span class="n">n_min</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">unf</span><span class="p">)</span>
 <span class="go">6.0</span>
 </pre></div>
