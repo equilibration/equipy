@@ -9,7 +9,7 @@
 !LICENSE
 !template.latex
 !*/
-
+!versioning/minor_build.json
 examples/**/*
 notebooks/**/*
 !docs/**/*
