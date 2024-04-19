@@ -1,8 +1,15 @@
 from setuptools import setup, find_packages
 import json 
+import os
 
-with open("versioning/minor_build.json", "r") as f:
-    minor_version = json.load(f)
+try:
+    with open("versioning/minor_build.json", "r") as f:
+        minor_version = json.load(f)
+except:
+    # for bugfixing
+    print(os.listdir())
+    print(os.getcwd())
+    os.system("cat equipy.egg-info/SOURCES.txt")
 
 with open("README.rst", "r") as f:
     long_description = f.read()
