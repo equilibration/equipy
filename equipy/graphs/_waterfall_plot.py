@@ -8,8 +8,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import re
 from typing import Union, Optional
-from ..metrics._fairness_metrics import unfairness_dict
-from ..fairness._wasserstein import MultiWasserstein
 
 
 def _set_colors(substraction_list: list[float]) -> list[str]:
@@ -165,27 +163,17 @@ def _values_to_distance(values: list[float]) -> list[float]:
     distance = list(arr) + [-values[-1]]
     return distance
 
-def fair_waterfall_plot(sensitive_features_calib: np.ndarray,
-                        sensitive_features_test: np.ndarray,
-                        y_calib: np.ndarray,
-                        y_test: np.ndarray,
-                        epsilon: Optional[float] = None
-                        ) -> plt.Axes:
+
+def fair_waterfall_plot(unfs_exact: dict[str, np.ndarray], unfs_approx: Optional[dict[str, np.ndarray]] = None) -> plt.Axes:
     """
     Generate a waterfall plot illustrating the sequential fairness in a model.
 
     Parameters
     ----------
-    sensitive_features_calib : numpy.ndarray
-        Sensitive features for calibration.
-    sensitive_features_test : numpy.ndarray
-        Sensitive features for testing.
-    y_calib : numpy.ndarray
-        Predictions for calibration.
-    y_test : numpy.ndarray
-        Predictions for testing.
-    epsilon : float, optional, default = None
-        Epsilon value for calculating Wasserstein distance
+    unfs_exact : dict
+        Dictionary containing fairness values for each step in the exact fairness scenario.
+    unfs_approx : dict, optional
+        Dictionary containing fairness values for each step in the approximate fairness scenario. Default is None.
 
     Returns
     -------
@@ -197,42 +185,22 @@ def fair_waterfall_plot(sensitive_features_calib: np.ndarray,
     The function creates a waterfall plot with bars representing the fairness values at each step.
     If both exact and approximate fairness values are provided, bars are color-coded and labeled accordingly.
     The legend is added to distinguish between different bars in the plot.
-
-    Examples
-    --------
-    >>> from sklearn.metrics import f1_score
-    >>> sensitive_features_calib = pd.DataFrame({'color': ['red', 'blue', 'green', 'blue'], 'nb_child': [1, 2, 0, 2]})
-    >>> sensitive_features_test = pd.DataFrame({'color': ['blue', 'blue', 'blue', 'green'], 'nb_child': [3, 2, 1, 2]})
-    >>> y_calib = np.array([0.6, 0.43, 0.32, 0.8])
-    >>> y_test = np.array([0.8, 0.35, 0.23, 0.2])
-    >>> y_true_test = np.array(['no', 'no', 'yes', 'no'])
-    >>> fair_waterfall_plot(sensitive_features_calib, sensitive_features_test, y_calib, y_test, epsilon=[0, 0.5])
-    
     """
-    
-    exact_wst = MultiWasserstein()
-    exact_wst.fit(y_calib, sensitive_features_calib)
-    y_final_fair = exact_wst.transform(y_test, sensitive_features_test)
-    y_sequential_fair = exact_wst.get_sequential_fairness()
-    init_unfs_exact = unfairness_dict(y_sequential_fair, sensitive_features_test)
-    unfs_exact = {key: round(value, 4) for key, value in init_unfs_exact.items()}
-    unfs_approx = None
 
-    if epsilon is not None:
-        approx_wst = MultiWasserstein()
-        approx_wst.fit(y_calib, sensitive_features_calib)
-        approx_y_final_fair = approx_wst.transform(y_test, sensitive_features_test, epsilon=epsilon)
-        approx_y_sequential_fair = approx_wst.get_sequential_fairness()
-        init_unfs_approx = unfairness_dict(approx_y_sequential_fair, sensitive_features_test)
-        unfs_approx = {key: round(value, 4) for key, value in init_unfs_approx.items()}
-    
     fig, ax = plt.subplots()
 
-    sens = list(unfs_exact.keys())
+    
+    sens = [int(''.join(re.findall(r'\d+', key))) for key in list(unfs_exact.keys())[1:]]
 
     labels = []
+    for i in range(len(list(unfs_exact.keys())[1:])):
+        if i == 0: 
+            labels.append(f"$A_{sens[i]}$-fair")
+        elif i == len(list(unfs_exact.keys())[1:])-1: 
+            labels.append(f"$A_{1}$" + r"$_:$" + f"$_{sens[i]}$-fair")
+        else:
+            labels.append(f"$A_{{{','.join(map(str, sens[0:i+1]))}}}$-fair")
 
-    labels = [s + '-fair' for s in sens[1:]]
     leg = ('Base model',) + tuple(labels) + ('Final model',)
     base_exact = list(unfs_exact.values())
     values_exact = [0] + base_exact
@@ -284,12 +252,9 @@ def fair_waterfall_plot(sensitive_features_calib: np.ndarray,
                     if unfs_approx is None else tuple(base_approx), pps, ax)
     _add_doted_points(ax, tuple(base_exact)
                       if unfs_approx is None else tuple(base_approx))
-    ax.set_ylabel('Total unfairness')
-    ax.set_ylim(0, base_exact[0]+base_exact[0]/10)
-    #ax.set_title(
-    #    f'Sequential ({"exact" if unfs_approx is None else "approximate"}) fairness: $A_{tuple(unfs_exact.keys())[-1][-1]}$ result')
+    ax.set_ylabel(f'Unfairness in $A_{tuple(unfs_exact.keys())[-1][-1]}$')
+    ax.set_ylim(0, 1.1)
     ax.set_title(
-        f'Sequential ({"exact" if unfs_approx is None else "approximate"}) fairness')
+        f'Sequential ({"exact" if unfs_approx is None else "approximate"}) fairness: $A_{tuple(unfs_exact.keys())[-1][-1]}$ result')
     plt.show()
     return ax
-
