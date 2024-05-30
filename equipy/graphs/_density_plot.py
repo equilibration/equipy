@@ -120,9 +120,8 @@ def fair_density_plot(sensitive_features_calib: np.ndarray,
                         subset_data['Prediction'], label=f'{mod}', fill=True, alpha=0.2, ax=axes[j, i])
                 else:
                     kde = beta_kernel(np.array(subset_data['Prediction']), x_grid)
-                    ax = axes[j, i]
-                    ax.plot(x_grid, kde, label=f'{mod}')
-                    ax.fill_between(x_grid, kde, alpha=0.2)
+                    sns.lineplot(x = x_grid, y = kde, label=f'{mod}', ax=axes[j, i])
+                    axes[j, i].fill_between(x_grid, kde, alpha=0.2)
             axes[j, i].legend(title=col, fontsize=14, title_fontsize=18)
             axes[j, i].set_xlabel(x_axes[key], fontsize=20)
             axes[j, i].set_ylabel('Density', fontsize=20)
@@ -143,9 +142,8 @@ def fair_density_plot(sensitive_features_calib: np.ndarray,
                         ax=axes[sensitive_features_test.shape[1], i])
                 else:
                     kde = beta_kernel(np.array(subset_data['Prediction']), x_grid)
-                    ax = axes[sensitive_features_test.shape[1], i]
-                    ax.plot(x_grid, kde, label=f'{mod}')
-                    ax.fill_between(x_grid, kde, alpha=0.2)
+                    sns.lineplot(x = x_grid, y = kde, label=perm_str, ax=axes[sensitive_features_test.shape[1], i])
+                    axes[sensitive_features_test.shape[1], i].fill_between(x_grid, kde, alpha=0.2)
         axes[sensitive_features_test.shape[1], i].legend(title='Intersection', fontsize=14, title_fontsize=18)
         axes[sensitive_features_test.shape[1], i].set_xlabel(x_axes[key], fontsize=20)
         axes[sensitive_features_test.shape[1], i].set_ylabel('Density', fontsize=20)
