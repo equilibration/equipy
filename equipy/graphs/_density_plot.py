@@ -86,7 +86,8 @@ def fair_density_plot(sensitive_features_calib: np.ndarray,
     type = 'regression'
     if np.all((0 <= y_test) & (y_test <= 1)):
         type = 'classification'
-        x_grid = np.linspace(y_test.min(), y_test.max(), 100)
+        nb_points = np.min([1000, np.max([100, len(y_test)*3])])
+        x_grid = np.linspace(0, 1, nb_points)
     
     exact_wst = MultiWasserstein()
     exact_wst.fit(y_calib, sensitive_features_calib)
