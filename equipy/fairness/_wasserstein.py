@@ -286,12 +286,12 @@ class MultiWasserstein():
                 self.ecdf_all[col] = {}
                 self.eqf_all[col] = {}
                 sensitive_filtered = sensitive_features.drop(columns=[col])
-                combinations = sensitive_filtered.drop_duplicates()
+                combinations = sensitive_filtered.drop_duplicates().copy()
                 combinations['concat'] = combinations.astype(str).agg(''.join, axis=1)
                 sensitive_filtered = sensitive_filtered.astype(str).agg(''.join, axis=1)
                 for value in combinations['concat']:
                     cond = sensitive_filtered == value
-                    intersection = sensitive_features[cond].apply(lambda row: ''.join(row.astype(str)), axis=1)
+                    intersection = sensitive_features.loc[cond].apply(lambda row: ''.join(row.astype(str)), axis=1)
                     new_sens = pd.DataFrame({'intersection': intersection})
                     wasserstein_instance = FairWasserstein(sigma = self.sigma)
                     wasserstein_instance.fit(y_inter[cond], new_sens)
