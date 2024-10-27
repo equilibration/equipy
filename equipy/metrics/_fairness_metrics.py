@@ -15,6 +15,8 @@ import pandas as pd
 # WARNING:You cannot calculate the EQF function of a single value : this means that if
 # only one individual has a specific sensitive value, you cannot use the transform function.
 
+def identity(x):
+    return x
 
 class EQF:
     """

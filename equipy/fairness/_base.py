@@ -7,7 +7,7 @@ Base class containing all necessary calculations to make predictions fair.
 from statsmodels.distributions.empirical_distribution import ECDF
 import numpy as np
 import pandas as pd
-from ..metrics._fairness_metrics import EQF
+from ..metrics._fairness_metrics import EQF, identity
 
 
 class BaseHelper():
