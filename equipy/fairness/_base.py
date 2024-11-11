@@ -168,4 +168,7 @@ class BaseHelper():
         for mod in modalities_test:
             y_fair[location_modalities[mod]] += self._get_correction(
                 mod, y_with_noise, location_modalities, modalities_test)
+        if np.all((y >= 0) & (y <= 1)):
+            y_fair[y_fair < 0] = 0
+            y_fair[y_fair > 1] = 1
         return y_fair
