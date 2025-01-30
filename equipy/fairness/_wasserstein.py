@@ -11,7 +11,9 @@ The module structure is as follows:
 # License: BSD 3 clause
 import numpy as np
 import pandas as pd
+import itertools
 from ..utils.checkers import _check_epsilon, _check_epsilon_size, _check_mod, _check_shape, _check_nb_observations, _check_col, _check_unique_mod
+from ..metrics._fairness_metrics import identity
 from ._base import BaseHelper
 from typing import Optional
 
@@ -276,18 +278,45 @@ class MultiWasserstein():
         _check_shape(y, sensitive_features)
         self.columns_calib_all = sensitive_features.columns
 
-        for i, col in enumerate(sensitive_features.columns):
-            sens = sensitive_features[[col]]
-            wasserstein_instance = FairWasserstein(sigma=self.sigma)
-            if i == 0:
-                y_inter = y
-            wasserstein_instance.fit(y_inter, sens)
-            self.modalities_calib_all[col] = wasserstein_instance.modalities_calib
-            self.weights_all[col] = wasserstein_instance.weights
-            self.eqf_all[col] = wasserstein_instance.eqf
-            self.ecdf_all[col] = wasserstein_instance.ecdf
-            y_inter = wasserstein_instance.transform(y_inter, sens)
+        y_inter = y.copy()
 
+        for col in sensitive_features.columns:
+            if sensitive_features.shape[1] > 1:
+                self.modalities_calib_all[col] = {}
+                self.weights_all[col] = {}
+                self.ecdf_all[col] = {}
+                self.eqf_all[col] = {}
+                sensitive_filtered = sensitive_features.drop(columns=[col])
+                combinations = sensitive_filtered.drop_duplicates().copy()
+                combinations['concat'] = combinations.astype(str).agg(''.join, axis=1)
+                sensitive_filtered = sensitive_filtered.astype(str).agg(''.join, axis=1)
+                for value in combinations['concat']:
+                    cond = sensitive_filtered == value
+                    intersection = sensitive_features.loc[cond].apply(lambda row: ''.join(row.astype(str)), axis=1)
+                    wasserstein_instance = FairWasserstein(sigma = self.sigma)
+                    if len(intersection.unique()) == 1:
+                        self.modalities_calib_all[col][value] = set(intersection.unique())
+                        self.weights_all[col][value] = {intersection.unique()[0]: 1}
+                        self.eqf_all[col][value] = {intersection.unique()[0]: identity}
+                        self.ecdf_all[col][value] = {intersection.unique()[0]: identity}
+                    else:
+                        new_sens = pd.DataFrame({'intersection': intersection})
+                        wasserstein_instance.fit(y_inter[cond], new_sens)
+                        self.modalities_calib_all[col][value] = wasserstein_instance.modalities_calib
+                        self.weights_all[col][value] = wasserstein_instance.weights
+                        self.eqf_all[col][value] = wasserstein_instance.eqf
+                        self.ecdf_all[col][value] = wasserstein_instance.ecdf
+                        y_inter[cond] = wasserstein_instance.transform(y_inter[cond], new_sens)
+                sensitive_features = sensitive_features.drop(columns=col)
+            else:
+                wasserstein_instance = FairWasserstein(sigma = self.sigma)
+                wasserstein_instance.fit(y_inter, sensitive_features[[col]])
+                self.modalities_calib_all[col] = wasserstein_instance.modalities_calib
+                self.weights_all[col] = wasserstein_instance.weights
+                self.eqf_all[col] = wasserstein_instance.eqf
+                self.ecdf_all[col] = wasserstein_instance.ecdf
+                y_inter = wasserstein_instance.transform(y_inter, sensitive_features[[col]])
+    
     def transform(self, y: np.ndarray, sensitive_features: pd.DataFrame, epsilon: Optional[list[float]] = None) -> np.ndarray:
         """
         Transform the calib and test data to enforce fairness using Wasserstein distance.
@@ -344,20 +373,36 @@ class MultiWasserstein():
         _check_col(self.columns_calib_all, sensitive_features.columns)
 
         self.y_fair['Base model'] = y
+        y_inter = y.copy()
 
         for i, col in enumerate(sensitive_features.columns):
-            sens = sensitive_features[[col]]
-            wasserstein_instance = FairWasserstein(sigma=self.sigma)
-            if i == 0:
-                y_inter = y
-            wasserstein_instance.modalities_calib = self.modalities_calib_all[col]
-            wasserstein_instance.columns_calib = sens.columns
-            wasserstein_instance.weights = self.weights_all[col]
-            wasserstein_instance.eqf = self.eqf_all[col]
-            wasserstein_instance.ecdf = self.ecdf_all[col]
-            y_inter = wasserstein_instance.transform(
-                y_inter, sens, epsilon[i])
-            self.y_fair[col] = y_inter
+            if sensitive_features.shape[1] > 1:
+                sens_filtered = sensitive_features.drop(columns=[col])
+                combinations = sens_filtered.drop_duplicates().reset_index(drop=True)
+                combinations['concat'] = combinations.astype(str).agg(''.join, axis=1)
+                sens_filtered = sens_filtered.astype(str).agg(''.join, axis=1)
+                for value in combinations['concat']:
+                    cond = sens_filtered == value
+                    intersection = sensitive_features[cond].apply(lambda row: ''.join(row.astype(str)), axis=1)
+                    new_sens = pd.DataFrame({'intersection': intersection})
+                    wasserstein_instance = FairWasserstein(sigma = self.sigma)
+                    wasserstein_instance.columns_calib = new_sens.columns
+                    wasserstein_instance.modalities_calib = self.modalities_calib_all[col][value]
+                    wasserstein_instance.weights = self.weights_all[col][value]
+                    wasserstein_instance.eqf = self.eqf_all[col][value]
+                    wasserstein_instance.ecdf = self.ecdf_all[col][value]
+                    y_inter[cond] = wasserstein_instance.transform(y_inter[cond], new_sens, epsilon[i])
+                sensitive_features = sensitive_features.drop(columns=col)
+            else:
+                wasserstein_instance = FairWasserstein(sigma = self.sigma)
+                wasserstein_instance.columns_calib = sensitive_features[[col]].columns
+                wasserstein_instance.modalities_calib = self.modalities_calib_all[col]
+                wasserstein_instance.weights = self.weights_all[col]
+                wasserstein_instance.eqf = self.eqf_all[col]
+                wasserstein_instance.ecdf = self.ecdf_all[col]
+                wasserstein_instance.columns_calib = sensitive_features[[col]].columns
+                y_inter = wasserstein_instance.transform(y_inter, sensitive_features[[col]], epsilon[i])                                                                     
+            self.y_fair[col] = y_inter.copy()
         return self.y_fair[col]
     
     def fit_transform(self, y_calib:np.ndarray, sensitive_features_calib:pd.DataFrame, y_test:np.ndarray, sensitive_features_test:pd.DataFrame,epsilon: Optional[list[float]] = None)->np.array:

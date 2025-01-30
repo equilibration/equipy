@@ -7,7 +7,7 @@ Base class containing all necessary calculations to make predictions fair.
 from statsmodels.distributions.empirical_distribution import ECDF
 import numpy as np
 import pandas as pd
-from ..metrics._fairness_metrics import EQF
+from ..metrics._fairness_metrics import EQF, identity
 
 
 class BaseHelper():
@@ -168,4 +168,7 @@ class BaseHelper():
         for mod in modalities_test:
             y_fair[location_modalities[mod]] += self._get_correction(
                 mod, y_with_noise, location_modalities, modalities_test)
+        if np.all((y >= 0) & (y <= 1)):
+            y_fair[y_fair < 0] = 0
+            y_fair[y_fair > 1] = 1
         return y_fair

@@ -59,51 +59,75 @@ def fair_density_plot(sensitive_features_calib: np.ndarray,
     exact_wst.fit(y_calib, sensitive_features_calib)
     y_final_fair = exact_wst.transform(y_test, sensitive_features_test, epsilon=epsilon)
     y_sequential_fair = exact_wst.get_sequential_fairness()
-
     n = sensitive_features_test.shape[1]+1
-    fig, axes = plt.subplots(nrows=n, ncols=n, figsize=(26, 18))
-    fig.suptitle('Density function sequentally fair', fontsize=40)
-    modalities = {}
-    x_axes = {}
 
-    mod_permutations = list(product(*[sensitive_features_test[col].unique() for
-                                      col in sensitive_features_test.columns]))
-    sensitive_features_test.reset_index(drop=True, inplace=True)
-
-    for i, key in enumerate(y_sequential_fair.keys()):
-        if key == 'Base model':
-            x_axes[key] = 'Base model predictions'
-        else:
-            x_axes[key] = f'Fair predictions in {key}'
-        df = pd.DataFrame()
-        df['Prediction'] = y_sequential_fair[key]
-        df = pd.concat([df, sensitive_features_test], axis=1)
-        for j, col in enumerate(sensitive_features_test.columns):
+    if len(sensitive_features_test.columns) == 1:
+        fig, axes = plt.subplots(nrows=n-1, ncols=n, figsize=(26, 18))
+        fig.suptitle('Density function sequentally fair', fontsize=40)
+        modalities = {}
+        x_axes = {}
+        sensitive_features_test.reset_index(drop=True, inplace=True)
+        for i, key in enumerate(y_sequential_fair.keys()):
+            if key == 'Base model':
+                x_axes[key] = 'Base model predictions'
+            else:
+                x_axes[key] = f'Fair predictions in {key}'
+            df = pd.DataFrame()
+            df['Prediction'] = y_sequential_fair[key]
+            df = pd.concat([df, sensitive_features_test], axis=1)
+            col = sensitive_features_test.columns[0]
             modalities[col] = df[col].unique()
             for mod in modalities[col]:
                 subset_data = df[df[col] == mod]
                 sns.kdeplot(
-                    subset_data['Prediction'], label=f'{mod}', fill=True, alpha=0.2, ax=axes[j, i])
-            axes[j, i].legend(title=col, fontsize=14, title_fontsize=18)
-            axes[j, i].set_xlabel(x_axes[key], fontsize=20)
-            axes[j, i].set_ylabel('Density', fontsize=20)
-            axes[j, i].xaxis.set_tick_params(labelsize=20)
-            axes[j, i].yaxis.set_tick_params(labelsize=20)
-        for perm in mod_permutations:
-            perm_str = '-'.join(map(str, perm))
-            conditions = []
-            for col, value in zip(sensitive_features_test.columns, perm):
-                conditions.append(df[col] == value)
-            subset_data = df
-            for condition in conditions:
-                subset_data = subset_data.loc[condition]
-            if not subset_data.empty:
-                sns.kdeplot(
-                    subset_data['Prediction'], label=perm_str, fill=True, alpha=0.2,
-                    ax=axes[sensitive_features_test.shape[1], i])
-        axes[sensitive_features_test.shape[1], i].legend(title='Intersection', fontsize=14, title_fontsize=18)
-        axes[sensitive_features_test.shape[1], i].set_xlabel(x_axes[key], fontsize=20)
-        axes[sensitive_features_test.shape[1], i].set_ylabel('Density', fontsize=20)
-        axes[sensitive_features_test.shape[1], i].xaxis.set_tick_params(labelsize=20)
-        axes[sensitive_features_test.shape[1], i].yaxis.set_tick_params(labelsize=20)
+                    subset_data['Prediction'], label=f'{mod}', fill=True, alpha=0.2, ax=axes[i])
+            axes[i].legend(title=col, fontsize=14, title_fontsize=18)
+            axes[i].set_xlabel(x_axes[key], fontsize=20)
+            axes[i].set_ylabel('Density', fontsize=20)
+            axes[i].xaxis.set_tick_params(labelsize=20)
+            axes[i].yaxis.set_tick_params(labelsize=20)
+    else:
+        fig, axes = plt.subplots(nrows=n, ncols=n, figsize=(26, 18))
+        fig.suptitle('Density function sequentally fair', fontsize=40)
+        modalities = {}
+        x_axes = {}
+        mod_permutations = list(product(*[sensitive_features_test[col].unique() for
+                                      col in sensitive_features_test.columns]))
+        sensitive_features_test.reset_index(drop=True, inplace=True)
+        for i, key in enumerate(y_sequential_fair.keys()):
+            if key == 'Base model':
+                x_axes[key] = 'Base model predictions'
+            else:
+                x_axes[key] = f'Fair predictions in {key}'
+            df = pd.DataFrame()
+            df['Prediction'] = y_sequential_fair[key]
+            df = pd.concat([df, sensitive_features_test], axis=1)
+            for j, col in enumerate(sensitive_features_test.columns):
+                modalities[col] = df[col].unique()
+                for mod in modalities[col]:
+                    subset_data = df[df[col] == mod]
+                    sns.kdeplot(
+                        subset_data['Prediction'], label=f'{mod}', fill=True, alpha=0.2, ax=axes[j, i])
+                axes[j, i].legend(title=col, fontsize=14, title_fontsize=18)
+                axes[j, i].set_xlabel(x_axes[key], fontsize=20)
+                axes[j, i].set_ylabel('Density', fontsize=20)
+                axes[j, i].xaxis.set_tick_params(labelsize=20)
+                axes[j, i].yaxis.set_tick_params(labelsize=20)
+            for perm in mod_permutations:
+                perm_str = '-'.join(map(str, perm))
+                conditions = []
+                for col, value in zip(sensitive_features_test.columns, perm):
+                    conditions.append(df[col] == value)
+                subset_data = df
+                for condition in conditions:
+                    subset_data = subset_data.loc[condition]
+                if not subset_data.empty:
+                    sns.kdeplot(
+                        subset_data['Prediction'], label=perm_str, fill=True, alpha=0.2,
+                        ax=axes[sensitive_features_test.shape[1], i])
+            axes[sensitive_features_test.shape[1], i].legend(title='Intersection', fontsize=14, title_fontsize=18)
+            axes[sensitive_features_test.shape[1], i].set_xlabel(x_axes[key], fontsize=20)
+            axes[sensitive_features_test.shape[1], i].set_ylabel('Density', fontsize=20)
+            axes[sensitive_features_test.shape[1], i].xaxis.set_tick_params(labelsize=20)
+            axes[sensitive_features_test.shape[1], i].yaxis.set_tick_params(labelsize=20)
     return axes
