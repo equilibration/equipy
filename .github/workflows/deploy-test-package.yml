@@ -8,15 +8,15 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: Increase version number
-        uses: yoichiro/gh-action-increment-value@main
-        with:
-          target_directory: 'versioning'
-          target_file: 'minor_build.json'
-          prefix: 'buildNumber":'
-          suffix: '}'
-          commit_message: 'Increment the build number to '
+      # - uses: actions/checkout@v4
+      # - name: Increase version number
+      #   uses: yoichiro/gh-action-increment-value@main
+      #   with:
+      #     target_directory: 'versioning'
+      #     target_file: 'minor_build.json'
+      #     prefix: 'buildNumber":'
+      #     suffix: '}'
+      #     commit_message: 'Increment the build number to '
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
