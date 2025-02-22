@@ -278,7 +278,7 @@ def fair_waterfall_plot(sensitive_features_calib: np.ndarray,
         _add_legend(pps, distance_exact)
 
     fig.legend(loc='upper center', bbox_to_anchor=(
-        0.5, 0), ncol=3, fancybox=True)
+        0.5, 0), ncol=4, fancybox=True)
 
     _add_bar_labels(tuple(base_exact)
                     if unfs_approx is None else tuple(base_approx), pps, ax)
@@ -291,5 +291,5 @@ def fair_waterfall_plot(sensitive_features_calib: np.ndarray,
     ax.set_title(
         f'Sequential ({"exact" if unfs_approx is None else "approximate"}) fairness')
     plt.show()
-    return ax
+    return fig, ax
 

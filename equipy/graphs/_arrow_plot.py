@@ -21,6 +21,7 @@ from ..metrics._performance_metrics import performance_dict
 
 def fair_customized_arrow_plot(unfs_dict: dict[str, np.ndarray],
                                performance_dict: dict[str, np.ndarray],
+                               figsize,
                                permutations: bool = False,
                                base_model: bool = True,
                                final_model: bool = True) -> plt.Axes:
@@ -66,59 +67,87 @@ def fair_customized_arrow_plot(unfs_dict: dict[str, np.ndarray],
         first_label_not_used = True
         double_label_not_used = True
     
-    if first_sens not in first_current_sens:
-        first_current_sens.append(first_sens)
-        first_label_not_used = True
-    else:
-        first_label_not_used = False
-    
-    if double_sorted_sens not in double_current_sens:
-        double_current_sens.append(double_sorted_sens)
-        double_label_not_used = True
-    else:
-        double_label_not_used = False
-    
+    if len(sens) > 2:
+        if first_sens not in first_current_sens:
+            first_current_sens.append(first_sens)
+            first_label_not_used = True
+        else:
+            first_label_not_used = False
+
+        if double_sorted_sens not in double_current_sens:
+            double_current_sens.append(double_sorted_sens)
+            double_label_not_used = True
+        else:
+            double_label_not_used = False
+
     global ax
+    global fig
 
     if not permutations:
-        fig, ax = plt.subplots()
+        fig, ax = plt.subplots(figsize = figsize)
 
     line = ax.plot(x, y, linestyle="--", alpha=0.25, color="grey")[0]
 
-    for i in range(len(sens)):
-        if i > 0:
-            ax.arrow((x[i-1]+x[i])/2, (y[i-1]+y[i])/2, (x[i]-x[i-1])/10,
-                      (y[i]-y[i-1])/10, width = (np.max(y)-np.min(y))/70, 
-                      color ="grey")
-        if (i == 0) & (base_model):
-            line.axes.annotate(f"Base\nmodel", xytext=(
-                x[0]-5*np.min(x)/20, y[0]-y[0]/80), xy=(x[0], y[0]), size=10)
-            ax.scatter(x[0], y[0], label="Base model", marker="^", 
-                       color="darkgrey", s=100)
-        elif (i == 1) & (first_label_not_used):
-            label = f"{sens[i]}-fair"
-            line.axes.annotate(label, xytext=(
-                x[i]+np.min(x)/20, y[i]), xy=(x[i], y[i]), size=10)
-            ax.scatter(x[i], y[i], label=label, marker="+", s=150)
-        elif (i == len(x)-1) & (final_model):
-            label = f"Final fair model"
-            line.axes.annotate(label, xytext=(
-                x[i]+np.min(x)/20, y[i]), xy=(x[i], y[i]), size=10)
-            ax.scatter(x[i], y[i], label=label, marker="*", s=150,
-                       color="#d62728")
-        elif (i == 2) & (i < len(x)-1) & (double_label_not_used):
-            label = f"{sens[1]}-{sens[i]}-fair"
-            line.axes.annotate(label, xytext=(
-                x[i]+np.min(x)/20, y[i]), xy=(x[i], y[i]), size=10)
-            ax.scatter(x[i], y[i], label=label, marker="+", s=150)
-        elif (i!=0) & (i!=len(x)-1):
-            ax.scatter(x[i], y[i], marker="+", s=150, color="grey", alpha=0.4)
-    ax.set_xlabel("Unfairness")
-    ax.set_ylabel("Performance")
-    ax.set_title("Exact fairness")
-    ax.legend(loc="lower right")
+    if len(sens) > 2:
+        for i in range(len(sens)):
+            if i > 0:
+                ax.arrow((x[i-1]+x[i])/2, (y[i-1]+y[i])/2, (x[i]-x[i-1])/10,
+                        (y[i]-y[i-1])/10, width = (np.max(y)-np.min(y))/70, 
+                        color ="grey")
+            if (i == 0) & (base_model):
+                #line.axes.annotate(f"Base\nmodel", xytext=(
+                #    x[0]-5*np.min(x)/20, y[0]-y[0]/80), xy=(x[0], y[0]), size=10)
+                ax.scatter(x[0], y[0], label="Base model", marker="^", 
+                        color="darkgrey", s=100)
+            elif (i == 1) & (first_label_not_used):
+                label = f"{sens[i]}-fair"
+                #line.axes.annotate(label, xytext=(
+                #    x[i]+np.min(x)/20, y[i]), xy=(x[i], y[i]), size=10)
+                ax.scatter(x[i], y[i], label=label, marker="+", s=150)
+            elif (i == len(x)-1) & (final_model):
+                label = f"Final fair model"
+                #line.axes.annotate(label, xytext=(
+                #    x[i]+np.min(x)/20, y[i]), xy=(x[i], y[i]), size=10)
+                ax.scatter(x[i], y[i], label=label, marker="*", s=150,
+                        color="#d62728")
+            elif (i == 2) & (i < len(x)-1) & (double_label_not_used):
+                label = f"{sens[1]}-{sens[i]}-fair"
+                #line.axes.annotate(label, xytext=(
+                #    x[i]+np.min(x)/20, y[i]), xy=(x[i], y[i]), size=10)
+                ax.scatter(x[i], y[i], label=label, marker="+", s=150)
+            elif (i!=0) & (i!=len(x)-1):
+                ax.scatter(x[i], y[i], marker="+", s=150, color="grey", alpha=0.4)
+                
+        ax.set_xlabel("Unfairness")
+        ax.set_ylabel("Performance")
+        ax.set_title("Exact fairness")
+        #ax.legend(loc="lower right")
+        #ax.legend(loc='upper left', bbox_to_anchor=(1, 1))
+        ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.15), ncol=4)   
+    else:
+        for i in range(len(sens)):
+            if i > 0:
+                ax.arrow((x[i-1]+x[i])/2, (y[i-1]+y[i])/2, (x[i]-x[i-1])/10,
+                        (y[i]-y[i-1])/10, width = (np.max(y)-np.min(y))/70, 
+                        color ="grey")
+            if (i == 0) & (base_model):
+                ax.scatter(x[0], y[0], label="Base model", marker="^", 
+                           color="darkgrey", s=100)
+            elif (i == len(x)-1) & (final_model):
+                label = f"Final fair model"
+                #line.axes.annotate(label, xytext=(
+                #    x[i]+np.min(x)/20, y[i]), xy=(x[i], y[i]), size=10)
+                ax.scatter(x[i], y[i], label=label, marker="*", s=150,
+                        color="#d62728")
+        ax.set_xlabel("Unfairness")
+        ax.set_ylabel("Performance")
+        ax.set_title("Exact fairness")
+        #ax.legend(loc="lower right")
+        #ax.legend(loc='upper left', bbox_to_anchor=(1, 1))
+        ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.2), ncol=3)    
+    
     #ax.autoscale_view()
-    return ax
+    return fig, ax
 
 def fair_arrow_plot(sensitive_features_calib: pd.DataFrame,
                     sensitive_features_test: pd.DataFrame,
@@ -128,7 +157,8 @@ def fair_arrow_plot(sensitive_features_calib: pd.DataFrame,
                     epsilon: Optional[float] = None,
                     metric: Callable = mean_squared_error,
                     threshold: Optional[float] = None,
-                    positive_class: Union[int, str] = 1) -> plt.Axes:
+                    positive_class: Union[int, str] = 1,
+                    figsize = (30,10)) -> plt.Axes:
     """
     Generates an arrow plot representing the fairness-performance combinations step by step (by sensitive attribute) to reach fairness.
 
@@ -174,6 +204,7 @@ def fair_arrow_plot(sensitive_features_calib: pd.DataFrame,
     
     """
     global ax
+    global fig
     global double_current_sens
     double_current_sens = []
     global first_current_sens
@@ -188,10 +219,11 @@ def fair_arrow_plot(sensitive_features_calib: pd.DataFrame,
     perf_dict = performance_dict(y_true_test, y_sequential_fair, metric=metric, threshold=threshold, 
                                  positive_class=positive_class)
     
-    return fair_customized_arrow_plot(unfs_dict=unfs_dict, performance_dict=perf_dict)
+    return fair_customized_arrow_plot(unfs_dict=unfs_dict, performance_dict=perf_dict, figsize=figsize)
 
 def _fair_customized_multiple_arrow_plot(unfs_list: list[dict[str, np.ndarray]],
-                                         performance_list: list[dict[str, np.ndarray]]) -> plt.Axes:
+                                         performance_list: list[dict[str, np.ndarray]],
+                                         figsize) -> plt.Axes:
     """
     Plot arrows representing the fairness-performance ccombinations step by step (by sensitive attribute) to reach fairness for all permutations
     (order of sensitive variables for which fairness is calculated).
@@ -213,6 +245,7 @@ def _fair_customized_multiple_arrow_plot(unfs_list: list[dict[str, np.ndarray]],
     This function uses a global variable `ax` for plotting, ensuring compatibility with external code.
     """
     global ax
+    global fig
     global double_current_sens
     double_current_sens = []
     global first_current_sens
@@ -221,14 +254,17 @@ def _fair_customized_multiple_arrow_plot(unfs_list: list[dict[str, np.ndarray]],
     for i in range(len(unfs_list)):
         if i == 0:
             fair_customized_arrow_plot(unfs_list[i], performance_list[i],
-                                       permutations=True, final_model=False)
-        elif i == len(unfs_list)-1:
+                                       permutations=True, final_model=False,
+                                       figsize = figsize)
+        elif i != len(unfs_list)-1:
             fair_customized_arrow_plot(unfs_list[i], performance_list[i], 
-                                       permutations=True, base_model=False)
+                                       permutations=True, base_model=False, final_model=False,
+                                       figsize = figsize)
         else:
             fair_customized_arrow_plot(unfs_list[i], performance_list[i], 
-                                       permutations=True, base_model=False, final_model=False)
-    return ax
+                                       permutations=True, base_model=False,
+                                       figsize = figsize)
+    return fig, ax
 
 
 def fair_multiple_arrow_plot(sensitive_features_calib: pd.DataFrame,
@@ -236,6 +272,7 @@ def fair_multiple_arrow_plot(sensitive_features_calib: pd.DataFrame,
                              y_calib: np.ndarray,
                              y_test: np.ndarray,
                              y_true_test: np.ndarray,
+                             figsize,
                              epsilon: Optional[float] = None,
                              metric: Callable = mean_squared_error,
                              threshold: Optional[float] = None,
@@ -292,4 +329,4 @@ def fair_multiple_arrow_plot(sensitive_features_calib: pd.DataFrame,
         permut_y_fair_dict, all_combs_sensitive_features_test)
     performance_list = performance_permutations(
         y_true_test, permut_y_fair_dict, metric=metric, threshold=threshold, positive_class=positive_class)
-    return _fair_customized_multiple_arrow_plot(unfs_list, performance_list)
+    return _fair_customized_multiple_arrow_plot(unfs_list, performance_list, figsize = figsize)

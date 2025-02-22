@@ -17,7 +17,8 @@ def fair_density_plot(sensitive_features_calib: np.ndarray,
                       sensitive_features_test: np.ndarray,
                       y_calib: np.ndarray,
                       y_test: np.ndarray,
-                      epsilon: Optional[float] = None) -> plt.Axes:
+                      epsilon: Optional[float] = None,
+                      figsize= (26, 18)) -> plt.Axes:
     """
     Visualizes the distribution of predictions based on different sensitive features using kernel density estimates (KDE).
 
@@ -62,8 +63,9 @@ def fair_density_plot(sensitive_features_calib: np.ndarray,
     n = sensitive_features_test.shape[1]+1
 
     if len(sensitive_features_test.columns) == 1:
-        fig, axes = plt.subplots(nrows=n-1, ncols=n, figsize=(26, 18))
-        fig.suptitle('Density function sequentally fair', fontsize=40)
+        fig, axes = plt.subplots(nrows=n-1, ncols=n, figsize=figsize, constrained_layout=True)
+        #fig.subplots_adjust(right=0.75)
+        fig.suptitle('Group-wise model response distribution', fontsize=10)
         modalities = {}
         x_axes = {}
         sensitive_features_test.reset_index(drop=True, inplace=True)
@@ -81,14 +83,15 @@ def fair_density_plot(sensitive_features_calib: np.ndarray,
                 subset_data = df[df[col] == mod]
                 sns.kdeplot(
                     subset_data['Prediction'], label=f'{mod}', fill=True, alpha=0.2, ax=axes[i])
-            axes[i].legend(title=col, fontsize=14, title_fontsize=18)
-            axes[i].set_xlabel(x_axes[key], fontsize=20)
-            axes[i].set_ylabel('Density', fontsize=20)
-            axes[i].xaxis.set_tick_params(labelsize=20)
-            axes[i].yaxis.set_tick_params(labelsize=20)
+            #axes[i].legend(title=col, fontsize=8, title_fontsize=8, loc='upper left', bbox_to_anchor=(1, 1))
+            axes[i].legend(title=col, fontsize=8, title_fontsize=8, loc='upper center', bbox_to_anchor=(0.5, -0.25), ncol=2)
+            axes[i].set_xlabel(x_axes[key], fontsize=8)
+            axes[i].set_ylabel('Density', fontsize=8)
+            axes[i].xaxis.set_tick_params(labelsize=8)
+            axes[i].yaxis.set_tick_params(labelsize=8)
     else:
-        fig, axes = plt.subplots(nrows=n, ncols=n, figsize=(26, 18))
-        fig.suptitle('Density function sequentally fair', fontsize=40)
+        fig, axes = plt.subplots(nrows=n, ncols=n, figsize=figsize, constrained_layout=True)
+        fig.suptitle('Group-wise model response distribution', fontsize=30)
         modalities = {}
         x_axes = {}
         mod_permutations = list(product(*[sensitive_features_test[col].unique() for
@@ -108,7 +111,9 @@ def fair_density_plot(sensitive_features_calib: np.ndarray,
                     subset_data = df[df[col] == mod]
                     sns.kdeplot(
                         subset_data['Prediction'], label=f'{mod}', fill=True, alpha=0.2, ax=axes[j, i])
-                axes[j, i].legend(title=col, fontsize=14, title_fontsize=18)
+                #ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.1), ncol=2)
+                axes[j, i].legend(title=col, fontsize=14, title_fontsize=18, loc='upper center', bbox_to_anchor=(0.5, -0.25), ncol=2)
+                #axes[j, i].legend(title=col, fontsize=14, title_fontsize=18, loc='upper left', bbox_to_anchor=(1, 1))
                 axes[j, i].set_xlabel(x_axes[key], fontsize=20)
                 axes[j, i].set_ylabel('Density', fontsize=20)
                 axes[j, i].xaxis.set_tick_params(labelsize=20)
@@ -125,9 +130,12 @@ def fair_density_plot(sensitive_features_calib: np.ndarray,
                     sns.kdeplot(
                         subset_data['Prediction'], label=perm_str, fill=True, alpha=0.2,
                         ax=axes[sensitive_features_test.shape[1], i])
-            axes[sensitive_features_test.shape[1], i].legend(title='Intersection', fontsize=14, title_fontsize=18)
+            #axes[sensitive_features_test.shape[1], i].legend(title='Intersection', fontsize=14, title_fontsize=18,
+            #                                                 loc='upper left', bbox_to_anchor=(1, 1))
+            axes[sensitive_features_test.shape[1], i].legend(title='Intersection', fontsize=20, title_fontsize=20,
+                                                             loc='upper center', bbox_to_anchor=(0.5, -0.25), ncol=4)
             axes[sensitive_features_test.shape[1], i].set_xlabel(x_axes[key], fontsize=20)
             axes[sensitive_features_test.shape[1], i].set_ylabel('Density', fontsize=20)
             axes[sensitive_features_test.shape[1], i].xaxis.set_tick_params(labelsize=20)
             axes[sensitive_features_test.shape[1], i].yaxis.set_tick_params(labelsize=20)
-    return axes
+    return fig, axes

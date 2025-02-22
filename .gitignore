@@ -13,6 +13,7 @@
 examples/**/*
 notebooks/**/*
 !docs/**/*
+!demo_with_folktables.ipynb
 
 __pycache__/
 .DS_Store
