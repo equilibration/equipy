@@ -290,6 +290,5 @@ def fair_waterfall_plot(sensitive_features_calib: np.ndarray,
     #    f'Sequential ({"exact" if unfs_approx is None else "approximate"}) fairness: $A_{tuple(unfs_exact.keys())[-1][-1]}$ result')
     ax.set_title(
         f'Sequential ({"exact" if unfs_approx is None else "approximate"}) fairness')
-    plt.show()
     return fig, ax
 

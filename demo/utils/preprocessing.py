@@ -7,6 +7,9 @@ from sklearn.preprocessing import StandardScaler, OneHotEncoder
 
 import lightgbm as lgb
 
+import random
+random.seed(2023)
+
 def preprocess_census(data: pd.DataFrame,
                       target_feature: str, 
                       sensitive_features: list,

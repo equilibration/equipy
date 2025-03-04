@@ -16,6 +16,7 @@ from ..utils.checkers import _check_epsilon, _check_epsilon_size, _check_mod, _c
 from ..metrics._fairness_metrics import identity
 from ._base import BaseHelper
 from typing import Optional
+import random
 
 
 class FairWasserstein(BaseHelper):
@@ -41,11 +42,12 @@ class FairWasserstein(BaseHelper):
         Dictionary storing EQF (Empirical Quantile Function) objects for each sensitive modality.
     """
 
-    def __init__(self, sigma: float = 0.0001):
+    def __init__(self, sigma: float = 0.0001, seed = 2023):
         super().__init__()
         self.sigma = sigma
         self.modalities_calib = None
         self.columns_calib = None
+        super().__init__(seed)
 
     def fit(self, y: np.ndarray, sensitive_feature: pd.DataFrame) -> None:
         """
