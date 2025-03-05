@@ -2,7 +2,9 @@ import numpy as np
 import pandas as pd
 import lightgbm as lgb
 import random
-random.seed(2023)
+def set_seeds(seed=2023):
+    random.seed(seed)
+    np.random.seed(seed)
 
 def cv_early_stopping(params,
                       nfolds,
@@ -11,7 +13,10 @@ def cv_early_stopping(params,
                       X_train,
                       y_train,
                       categorical_feats, 
-                      objective='regression'):
+                      objective='regression',
+                      seed = 2023):
+    
+    set_seeds(seed)
     
     data_combined = X_train.copy()
     data_combined['target'] = y_train
@@ -32,7 +37,6 @@ def cv_early_stopping(params,
 
         X_valid = valid_fold.drop(columns='target')
         y_valid = valid_fold.loc[:, 'target']
-
 
         lgb_train = lgb.Dataset(data=X_train, 
                                 label=y_train, 

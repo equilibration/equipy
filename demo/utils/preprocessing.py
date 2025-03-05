@@ -8,7 +8,9 @@ from sklearn.preprocessing import StandardScaler, OneHotEncoder
 import lightgbm as lgb
 
 import random
-random.seed(2023)
+def set_seeds(seed=2023):
+    random.seed(seed)
+    np.random.seed(seed)
 
 def preprocess_census(data: pd.DataFrame,
                       target_feature: str, 
@@ -20,12 +22,14 @@ def preprocess_census(data: pd.DataFrame,
                       calib_size: float = 0.2,
                       split_seed: int = 42, 
                       objective='regression',
-                      ) -> dict:
+                      seed = 2023) -> dict:
     """
     Returns: A dictionary with preprocessed data
 
     ToDo: Fix issues if there are no categoricals
     """
+    set_seeds(seed)
+    
     # Out dict init
     return_dict = {}
 
@@ -40,7 +44,7 @@ def preprocess_census(data: pd.DataFrame,
                                                         random_state = split_seed)
     
     # Fit preprocessors
-    onehot_cands = list(set(X_train.columns) -
+    onehot_cands = sorted(set(X_train.columns) -
                         set(categorical_features) -
                         set(continuous_features))
     
