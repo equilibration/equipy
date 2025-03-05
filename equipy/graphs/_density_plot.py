@@ -8,7 +8,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
-from typing import Optional
+from typing import Optional, Union
 from ..fairness._wasserstein import MultiWasserstein
 from itertools import product
 from scipy.stats import beta
@@ -37,8 +37,8 @@ def beta_kernel(data_points: np.ndarray,
     kde = np.asarray(kde)
     return(kde)
 
-def fair_density_plot(sensitive_features_calib: np.ndarray,
-                      sensitive_features_test: np.ndarray,
+def fair_density_plot(sensitive_features_calib: Union[np.ndarray, pd.DataFrame],
+                      sensitive_features_test: Union[np.ndarray, pd.DataFrame],
                       y_calib: np.ndarray,
                       y_test: np.ndarray,
                       epsilon: Optional[float] = None,
@@ -48,9 +48,9 @@ def fair_density_plot(sensitive_features_calib: np.ndarray,
 
     Parameters
     ----------
-    sensitive_features_calib : numpy.ndarray
+    sensitive_features_calib : Union[np.ndarray, pd.DataFrame]
         Sensitive features for calibration.
-    sensitive_features_test : numpy.ndarray
+    sensitive_features_test : Union[np.ndarray, pd.DataFrame]
         Sensitive features for testing.
     y_calib : numpy.ndarray
         Predictions for calibration.
@@ -79,6 +79,19 @@ def fair_density_plot(sensitive_features_calib: np.ndarray,
     >>> fair_density_plot(sensitive_features_calib, sensitive_features_test, scores_calib, scores_test, epsilon)
     
     """
+    
+    if isinstance(sensitive_features_calib, np.ndarray):
+            if len(sensitive_features_calib.shape) == 1:
+                sensitive_features_calib = sensitive_features_calib.reshape(-1, 1)
+            sensitive_features_calib = pd.DataFrame(
+                sensitive_features_calib, columns=[f"sens{i+1}" for i in range(sensitive_features_calib.shape[1])]
+                )
+    if isinstance(sensitive_features_test, np.ndarray):
+            if len(sensitive_features_test.shape) == 1:
+                sensitive_features_test = sensitive_features_test.reshape(-1, 1)
+            sensitive_features_test = pd.DataFrame(
+                sensitive_features_test, columns=[f"sens{i+1}" for i in range(sensitive_features_test.shape[1])]
+                )
     
     type = 'regression'
     if np.all((0 <= y_test) & (y_test <= 1)):

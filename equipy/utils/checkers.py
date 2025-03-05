@@ -132,8 +132,8 @@ def _check_shape(y: np.ndarray, sensitive_features: pd.DataFrame) -> None:
     ValueError
         If the input arrays have incorrect shapes or data types.
     """
-    if not isinstance(sensitive_features, pd.DataFrame):
-        raise ValueError('sensitive_features must be a pandas DataFrame')
+    if not isinstance(sensitive_features, (pd.DataFrame, np.ndarray)):
+        raise ValueError('sensitive_features must be a pandas DataFrame or a np.ndarray')
 
     if not isinstance(y, np.ndarray):
         raise ValueError('y must be an array')

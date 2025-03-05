@@ -15,7 +15,7 @@ import itertools
 from ..utils.checkers import _check_epsilon, _check_epsilon_size, _check_mod, _check_shape, _check_nb_observations, _check_col, _check_unique_mod
 from ..metrics._fairness_metrics import identity
 from ._base import BaseHelper
-from typing import Optional
+from typing import Optional, Union
 import random
 
 
@@ -49,16 +49,16 @@ class FairWasserstein(BaseHelper):
         self.columns_calib = None
         super().__init__(seed)
 
-    def fit(self, y: np.ndarray, sensitive_feature: pd.DataFrame) -> None:
+    def fit(self, y: np.ndarray, sensitive_feature: Union[np.ndarray, pd.DataFrame]) -> None:
         """
         Perform fit on the calibration data and save the ECDF, EQF, and weights of the sensitive variable.
 
         Parameters
         ----------
         y : np.ndarray, shape (n_samples,)
-            The calibration labels.
+            The calibration predictions.
 
-        sensitive_feature : pd.DataFrame, shape (n_samples, 1)
+        sensitive_feature : Union[np.ndarray, pd.DataFrame], shape (n_samples, 1)
             The calibration samples representing one single sensitive attribute.
 
         Returns
@@ -80,6 +80,11 @@ class FairWasserstein(BaseHelper):
         >>> wasserstein.fit(y, sensitive_feature)
         """
         _check_shape(y, sensitive_feature)
+        if isinstance(sensitive_feature, np.ndarray):
+            sensitive_feature = sensitive_feature.reshape(-1, 1) 
+            sensitive_feature = pd.DataFrame(
+                sensitive_feature, columns=[f"sens{i+1}" for i in range(sensitive_feature.shape[1])]
+                )
         _check_unique_mod(sensitive_feature)
 
         self.modalities_calib = self._get_modalities(sensitive_feature)
@@ -87,16 +92,16 @@ class FairWasserstein(BaseHelper):
         self._compute_weights(sensitive_feature)
         self._estimate_ecdf_eqf(y, sensitive_feature, self.sigma)
 
-    def transform(self, y: np.ndarray, sensitive_feature: pd.DataFrame, epsilon: float = 0) -> np.ndarray:
+    def transform(self, y: np.ndarray, sensitive_feature: Union[np.ndarray, pd.DataFrame], epsilon: float = 0) -> np.ndarray:
         """
         Transform the test data to enforce fairness using Wasserstein distance.
 
         Parameters
         ----------
         y : np.ndarray, shape (n_samples,)
-            The target values of the test data.
+            The predictions of the test data.
 
-        sensitive_feature : pd.DataFrame, shape (n_samples, 1)
+        sensitive_feature : Union[np.ndarray, pd.DataFrame], shape (n_samples, 1)
             The test samples representing a single sensitive attribute.
 
         epsilon : float, optional (default=0)
@@ -136,6 +141,11 @@ class FairWasserstein(BaseHelper):
 
         _check_epsilon(epsilon)
         _check_shape(y, sensitive_feature)
+        if isinstance(sensitive_feature, np.ndarray):
+            sensitive_feature = sensitive_feature.reshape(-1, 1) 
+            sensitive_feature = pd.DataFrame(
+                sensitive_feature, columns=[f"sens{i+1}" for i in range(sensitive_feature.shape[1])]
+                )
         modalities_test = self._get_modalities(sensitive_feature)
         columns_test = sensitive_feature.columns
         _check_mod(self.modalities_calib, modalities_test)
@@ -144,22 +154,22 @@ class FairWasserstein(BaseHelper):
         y_fair = self._fair_y_values(y, sensitive_feature, modalities_test)
         return (1-epsilon)*y_fair + epsilon*y
     
-    def fit_transform(self, y_calib: np.ndarray, sensitive_feature_calib:pd.DataFrame, y_test:np.ndarray, sensitive_feature_test:pd.DataFrame, epsilon:float= 0) -> np.ndarray:
+    def fit_transform(self, y_calib: np.ndarray, sensitive_feature_calib: Union[np.ndarray, pd.DataFrame], y_test: np.ndarray, sensitive_feature_test:Union[np.ndarray, pd.DataFrame], epsilon:float= 0) -> np.ndarray:
         """
         Fit and transform the calibration and test data to enforce fairness using Wasserstein distance.
 
         Parameters
         ----------
         y_calib : np.ndarray, shape (n_samples,)
-            The target values of the calibration data.
+            The prediction values of the calibration data.
 
-        sensitive_feature_calib : pd.DataFrame, shape (n_samples, 1)
+        sensitive_feature_calib : Union[np.ndarray, pd.DataFrame], shape (n_samples, 1)
             The calibration samples representing a single sensitive attribute.
 
         y_test : np.ndarray, shape (n_samples,)
-            The target values of the test data.
+            The prediction values of the test data.
 
-        sensitive_feature_test : pd.DataFrame, shape (n_samples, 1)
+        sensitive_feature_test : Union[np.ndarray, pd.DataFrame], shape (n_samples, 1)
             The test samples representing a single sensitive attribute.
 
         epsilon : float, optional (default=0)
@@ -253,16 +263,16 @@ class MultiWasserstein():
 
         self.sigma = sigma
 
-    def fit(self, y: np.ndarray, sensitive_features: pd.DataFrame) -> None:
+    def fit(self, y: np.ndarray, sensitive_features: Union[np.ndarray, pd.DataFrame]) -> None:
         """
         Perform fit on the calibration data and save the ECDF, EQF, and weights for each sensitive variable.
 
         Parameters
         ----------
         y : np.ndarray, shape (n_samples,)
-            The calibration labels.
+            The calibration predictions.
 
-        sensitive_features : pd.DataFrame, shape (n_samples, n_sensitive_features)
+        sensitive_features : Union[np.ndarray, pd.DataFrame], shape (n_samples, n_sensitive_features)
             The calibration samples representing multiple sensitive attributes.
 
         Returns
@@ -278,6 +288,12 @@ class MultiWasserstein():
         """
         _check_nb_observations(sensitive_features)
         _check_shape(y, sensitive_features)
+        if isinstance(sensitive_features, np.ndarray):
+            if len(sensitive_features.shape) == 1:
+                sensitive_features = sensitive_features.reshape(-1, 1)
+            sensitive_features = pd.DataFrame(
+                sensitive_features, columns=[f"sens{i+1}" for i in range(sensitive_features.shape[1])]
+                )
         self.columns_calib_all = sensitive_features.columns
 
         y_inter = y.copy()
@@ -319,16 +335,16 @@ class MultiWasserstein():
                 self.ecdf_all[col] = wasserstein_instance.ecdf
                 y_inter = wasserstein_instance.transform(y_inter, sensitive_features[[col]])
     
-    def transform(self, y: np.ndarray, sensitive_features: pd.DataFrame, epsilon: Optional[list[float]] = None) -> np.ndarray:
+    def transform(self, y: np.ndarray, sensitive_features: Union[np.ndarray, pd.DataFrame], epsilon: Optional[list[float]] = None) -> np.ndarray:
         """
         Transform the calib and test data to enforce fairness using Wasserstein distance.
 
         Parameters
         ----------
         y : np.ndarray, shape (n_samples,)
-            The target values of the test data.
+            The prediction values of the test data.
 
-        sensitive_features : pd.DataFrame shape (n_samples, n_sensitive_features)
+        sensitive_features : Union[np.ndarray, pd.DataFrame] shape (n_samples, n_sensitive_features)
             The test samples representing multiple sensitive attributes.
 
         epsilon : list, shape (n_sensitive_features,), optional (default=None)
@@ -366,6 +382,12 @@ class MultiWasserstein():
         >>> print(fair_predictions)
         [0.42483123 0.36412012 0.36172012 0.36112012]
         """
+        if isinstance(sensitive_features, np.ndarray):
+            if len(sensitive_features.shape) == 1:
+                sensitive_features = sensitive_features.reshape(-1, 1) 
+            sensitive_features = pd.DataFrame(
+                sensitive_features, columns=[f"sens{i+1}" for i in range(sensitive_features.shape[1])]
+                )
         if epsilon is None:
             if sensitive_features.shape[1] == 1:
                 epsilon = [0]
@@ -407,22 +429,22 @@ class MultiWasserstein():
             self.y_fair[col] = y_inter.copy()
         return self.y_fair[col]
     
-    def fit_transform(self, y_calib:np.ndarray, sensitive_features_calib:pd.DataFrame, y_test:np.ndarray, sensitive_features_test:pd.DataFrame,epsilon: Optional[list[float]] = None)->np.array:
+    def fit_transform(self, y_calib:np.ndarray, sensitive_features_calib:Union[np.ndarray, pd.DataFrame], y_test:np.ndarray, sensitive_features_test:Union[np.ndarray, pd.DataFrame],epsilon: Optional[list[float]] = None)->np.array:
         """
         Fit and transform the calibration and test data to enforce fairness using Wasserstein distance.
 
         Parameters
         ----------
         y_calib : np.ndarray, shape (n_samples,)
-            The calibration labels.
+            The calibration predictions.
 
-        sensitive_features_calub : pd.DataFrame, shape (n_samples, n_sensitive_features)
+        sensitive_features_calub : Union[np.ndarray, pd.DataFrame], shape (n_samples, n_sensitive_features)
             The calibration samples representing multiple sensitive attributes.
 
         y_test : np.ndarray, shape (n_samples,)
             The target values of the test data.
 
-        sensitive_features_test : pd.DataFrame shape (n_samples, n_sensitive_features)
+        sensitive_features_test : Union[np.ndarray, pd.DataFrame] shape (n_samples, n_sensitive_features)
             The test samples representing multiple sensitive attributes.
 
         epsilon : list, shape (n_sensitive_features,), optional (default=None)

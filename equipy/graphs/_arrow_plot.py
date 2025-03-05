@@ -149,8 +149,8 @@ def fair_customized_arrow_plot(unfs_dict: dict[str, np.ndarray],
     #ax.autoscale_view()
     return fig, ax
 
-def fair_arrow_plot(sensitive_features_calib: pd.DataFrame,
-                    sensitive_features_test: pd.DataFrame,
+def fair_arrow_plot(sensitive_features_calib: Union[np.ndarray, pd.DataFrame],
+                    sensitive_features_test: Union[np.ndarray, pd.DataFrame],
                     y_calib: np.ndarray,
                     y_test: np.ndarray,
                     y_true_test: np.ndarray,
@@ -164,9 +164,9 @@ def fair_arrow_plot(sensitive_features_calib: pd.DataFrame,
 
     Parameters
     ----------
-    sensitive_features_calib : pd.DataFrame
+    sensitive_features_calib : Union[np.ndarray, pd.DataFrame]
         Sensitive features for calibration.
-    sensitive_features_test : pd.DataFrame
+    sensitive_features_test : Union[np.ndarray, pd.DataFrame]
         Sensitive features for testing.
     y_calib : numpy.ndarray
         Predictions for calibration.
@@ -250,7 +250,7 @@ def _fair_customized_multiple_arrow_plot(unfs_list: list[dict[str, np.ndarray]],
     double_current_sens = []
     global first_current_sens
     first_current_sens = []
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(figsize = figsize)
     for i in range(len(unfs_list)):
         if i == 0:
             fair_customized_arrow_plot(unfs_list[i], performance_list[i],
@@ -267,24 +267,24 @@ def _fair_customized_multiple_arrow_plot(unfs_list: list[dict[str, np.ndarray]],
     return fig, ax
 
 
-def fair_multiple_arrow_plot(sensitive_features_calib: pd.DataFrame,
-                             sensitive_features_test: pd.DataFrame,
+def fair_multiple_arrow_plot(sensitive_features_calib: Union[np.ndarray, pd.DataFrame],
+                             sensitive_features_test: Union[np.ndarray, pd.DataFrame],
                              y_calib: np.ndarray,
                              y_test: np.ndarray,
                              y_true_test: np.ndarray,
-                             figsize,
                              epsilon: Optional[float] = None,
                              metric: Callable = mean_squared_error,
                              threshold: Optional[float] = None,
-                             positive_class: Union[int, str] = 1) -> plt.Axes:
+                             positive_class: Union[int, str] = 1,
+                             figsize = (30,10)) -> plt.Axes:
     """
     Plot arrows representing the fairness-performance combinations step by step (by sensitive attribute) to reach fairness for different permutations.
 
     Parameters
     ----------
-    sensitive_features_calib : pd.DataFrame
+    sensitive_features_calib : Union[np.ndarray, pd.DataFrame]
         Sensitive features for calibration.
-    sensitive_features_test : pd.DataFrame
+    sensitive_features_test : Union[np.ndarray, pd.DataFrame]
         Sensitive features for testing.
     y_calib : numpy.ndarray
         Predictions for calibration.
@@ -321,6 +321,19 @@ def fair_multiple_arrow_plot(sensitive_features_calib: pd.DataFrame,
     >>> fair_multiple_arrow_plot(sensitive_features_calib, sensitive_features_test, y_calib, y_test, y_true_test, f1_score, threshold=0.5, positive_class='yes')
 
     """
+    if isinstance(sensitive_features_calib, np.ndarray):
+            if len(sensitive_features_calib.shape) == 1:
+                sensitive_features_calib = sensitive_features_calib.reshape(-1, 1)
+            sensitive_features_calib = pd.DataFrame(
+                sensitive_features_calib, columns=[f"sens{i+1}" for i in range(sensitive_features_calib.shape[1])]
+                )
+    if isinstance(sensitive_features_test, np.ndarray):
+            if len(sensitive_features_test.shape) == 1:
+                sensitive_features_test = sensitive_features_test.reshape(-1, 1)
+            sensitive_features_test = pd.DataFrame(
+                sensitive_features_test, columns=[f"sens{i+1}" for i in range(sensitive_features_test.shape[1])]
+                )
+
     permut_y_fair_dict = calculate_perm_wasserstein(
         y_calib, sensitive_features_calib, y_test, sensitive_features_test, epsilon=epsilon)
     all_combs_sensitive_features_test = permutations_columns(

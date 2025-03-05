@@ -6,6 +6,7 @@ Representation of sequential gain in fairness.
 # License: BSD 3 clause
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 import re
 from typing import Union, Optional
 from ..metrics._fairness_metrics import unfairness_dict
@@ -165,8 +166,8 @@ def _values_to_distance(values: list[float]) -> list[float]:
     distance = list(arr) + [-values[-1]]
     return distance
 
-def fair_waterfall_plot(sensitive_features_calib: np.ndarray,
-                        sensitive_features_test: np.ndarray,
+def fair_waterfall_plot(sensitive_features_calib: Union[np.ndarray, pd.DataFrame],
+                        sensitive_features_test: Union[np.ndarray, pd.DataFrame],
                         y_calib: np.ndarray,
                         y_test: np.ndarray,
                         epsilon: Optional[float] = None
@@ -176,9 +177,9 @@ def fair_waterfall_plot(sensitive_features_calib: np.ndarray,
 
     Parameters
     ----------
-    sensitive_features_calib : numpy.ndarray
+    sensitive_features_calib : Union[np.ndarray, pd.DataFrame]
         Sensitive features for calibration.
-    sensitive_features_test : numpy.ndarray
+    sensitive_features_test : Union[np.ndarray, pd.DataFrame]
         Sensitive features for testing.
     y_calib : numpy.ndarray
         Predictions for calibration.
