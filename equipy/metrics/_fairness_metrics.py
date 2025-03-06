@@ -197,7 +197,7 @@ def diff_quantile(data1: np.ndarray,
     return unfair_value
 
 
-def unfairness(y: np.ndarray, sensitive_features: pd.DataFrame, n_min: float = 1000) -> float:
+def unfairness(y: np.ndarray, sensitive_features: Union[np.ndarray, pd.DataFrame], n_min: float = 1000) -> float:
     """
     Compute the unfairness value for a given fair output (y) and multiple sensitive attributes data
     (sensitive_features) containing several modalities. If there is a single sensitive feature,
@@ -208,8 +208,8 @@ def unfairness(y: np.ndarray, sensitive_features: pd.DataFrame, n_min: float = 1
     Parameters
     ----------
     y : np.ndarray
-        Predicted (fair or not) output data.
-    sensitive_features : pd.DataFrame
+        Predicted (fair or not) outcome variable.
+    sensitive_features : Union[np.ndarray, pd.DataFrame]
         Sensitive attribute data.
     n_min : float
         Below this threshold, compute the unfairness based on the Wasserstein distance.
@@ -228,6 +228,11 @@ def unfairness(y: np.ndarray, sensitive_features: pd.DataFrame, n_min: float = 1
     >>> print(unf)
     6.0
     """
+    
+    if isinstance(sensitive_features, np.ndarray):
+        sensitive_features = pd.DataFrame(
+            sensitive_features, columns=[f"sens{i+1}" for i in range(sensitive_features.shape[1])]
+            )
     new_list = []
     for col in sensitive_features.columns:
         sensitive_feature = sensitive_features[col]
@@ -242,7 +247,7 @@ def unfairness(y: np.ndarray, sensitive_features: pd.DataFrame, n_min: float = 1
 
 
 def unfairness_dict(y_fair_dict: dict[str, np.ndarray],
-                    sensitive_features: pd.DataFrame,
+                    sensitive_features: Union[np.ndarray, pd.DataFrame],
                     n_min: float = 1000) -> dict[str, float]:
     """
     Compute unfairness values for sequentially fair output datasets and multiple sensitive
@@ -255,7 +260,7 @@ def unfairness_dict(y_fair_dict: dict[str, np.ndarray],
         containing the fair predictions corresponding to each sensitive feature.
         Each sensitive feature's fairness adjustment is performed sequentially,
         ensuring that each feature is treated fairly relative to the previous ones.
-    sensitive_features : pd.DataFrame
+    sensitive_features : Union[np.ndarray, pd.DataFrame]
         Sensitive attribute data.
     n_min : float
         Below this threshold, compute the unfairness based on the Wasserstein distance.
@@ -277,6 +282,11 @@ def unfairness_dict(y_fair_dict: dict[str, np.ndarray],
     >>> print(unfs_dict)
     {'Base model': 46.0, 'color': 28.0, 'nb_child': 14.0}
     """
+    if isinstance(sensitive_features, np.ndarray):
+        sensitive_features = pd.DataFrame(
+            sensitive_features, columns=[f"sens{i+1}" for i in range(sensitive_features.shape[1])]
+            )
+
     unfairness_dict = {}
     for key, y_fair in y_fair_dict.items():
         result = unfairness(y_fair, sensitive_features, n_min)

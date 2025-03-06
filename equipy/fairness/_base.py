@@ -8,6 +8,7 @@ from statsmodels.distributions.empirical_distribution import ECDF
 import numpy as np
 import pandas as pd
 from ..metrics._fairness_metrics import EQF, identity
+import random
 
 
 class BaseHelper():
@@ -28,11 +29,14 @@ class BaseHelper():
     estimation with random noise.
     """
 
-    def __init__(self):
+    def __init__(self, seed = 2023):
         self.ecdf = {}
         self.eqf = {}
 
         self.weights = {}
+        self.seed = seed  # Store the seed
+        self.rng = random.Random(self.seed)
+        
 
     def _get_modalities(self, sensitive_feature: pd.DataFrame) -> set:
         """
@@ -109,7 +113,9 @@ class BaseHelper():
             Dictionaries where keys are sensitive features and values are their ecdf and eqf.
         """
         location_modalities = self._get_location_modalities(sensitive_feature)
-        eps = np.random.uniform(-sigma, sigma, len(y))
+        eps = np.array([self.rng.uniform(-self.sigma, self.sigma) for x in y])
+        
+        #np.random.uniform(-sigma, sigma, len(y))
         for modality in self._get_modalities(sensitive_feature):
             self.ecdf[modality] = ECDF(y[location_modalities[modality]] +
                                        eps[location_modalities[modality]])
@@ -162,13 +168,17 @@ class BaseHelper():
             Fair values after applying correction.
         """
         location_modalities = self._get_location_modalities(sensitive_feature)
+        #print("loc_mod: ", location_modalities)
         y_fair = np.zeros_like(y)
-        eps = np.random.uniform(-self.sigma, self.sigma, len(y))
+        eps = np.array([self.rng.uniform(-self.sigma, self.sigma) for x in y])
+        #eps = np.random.uniform(-self.sigma, self.sigma, len(y))
         y_with_noise = y + eps
+        #print("noisy: ", y_with_noise)
         for mod in modalities_test:
             y_fair[location_modalities[mod]] += self._get_correction(
                 mod, y_with_noise, location_modalities, modalities_test)
         if np.all((y >= 0) & (y <= 1)):
             y_fair[y_fair < 0] = 0
             y_fair[y_fair > 1] = 1
+        #print("y_fair", y_fair)
         return y_fair
