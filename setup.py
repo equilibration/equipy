@@ -10,7 +10,7 @@ except:
     print(os.listdir())
     print(os.getcwd())
     os.system("cat equipy.egg-info/SOURCES.txt")
-    minor_version = {'buildNumber': '10'}
+    minor_version = {'buildNumber': '11'}
 
 with open("README.rst", "r") as f:
     long_description = f.read()
