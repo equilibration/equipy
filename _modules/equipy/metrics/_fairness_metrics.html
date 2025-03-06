@@ -443,7 +443,7 @@ document.write(`
     <span class="k">return</span> <span class="n">unfair_value</span>
 
 
-<div class="viewcode-block" id="unfairness"><a class="viewcode-back" href="../../../equipy.metrics.html#equipy.metrics.unfairness">[docs]</a><span class="k">def</span> <span class="nf">unfairness</span><span class="p">(</span><span class="n">y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">sensitive_features</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">n_min</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<div class="viewcode-block" id="unfairness"><a class="viewcode-back" href="../../../equipy.metrics.html#equipy.metrics.unfairness">[docs]</a><span class="k">def</span> <span class="nf">unfairness</span><span class="p">(</span><span class="n">y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">sensitive_features</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">],</span> <span class="n">n_min</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Compute the unfairness value for a given fair output (y) and multiple sensitive attributes data</span>
 <span class="sd">    (sensitive_features) containing several modalities. If there is a single sensitive feature,</span>
@@ -454,8 +454,8 @@ document.write(`
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    y : np.ndarray</span>
-<span class="sd">        Predicted (fair or not) output data.</span>
-<span class="sd">    sensitive_features : pd.DataFrame</span>
+<span class="sd">        Predicted (fair or not) outcome variable.</span>
+<span class="sd">    sensitive_features : Union[np.ndarray, pd.DataFrame]</span>
 <span class="sd">        Sensitive attribute data.</span>
 <span class="sd">    n_min : float</span>
 <span class="sd">        Below this threshold, compute the unfairness based on the Wasserstein distance.</span>
@@ -474,6 +474,11 @@ document.write(`
 <span class="sd">    &gt;&gt;&gt; print(unf)</span>
 <span class="sd">    6.0</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sensitive_features</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+        <span class="n">sensitive_features</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+            <span class="n">sensitive_features</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;sens</span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">sensitive_features</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])]</span>
+            <span class="p">)</span>
     <span class="n">new_list</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">sensitive_features</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
         <span class="n">sensitive_feature</span> <span class="o">=</span> <span class="n">sensitive_features</span><span class="p">[</span><span class="n">col</span><span class="p">]</span>
@@ -488,7 +493,7 @@ document.write(`
 
 
 <span class="k">def</span> <span class="nf">unfairness_dict</span><span class="p">(</span><span class="n">y_fair_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span>
-                    <span class="n">sensitive_features</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+                    <span class="n">sensitive_features</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">],</span>
                     <span class="n">n_min</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Compute unfairness values for sequentially fair output datasets and multiple sensitive</span>
@@ -501,7 +506,7 @@ document.write(`
 <span class="sd">        containing the fair predictions corresponding to each sensitive feature.</span>
 <span class="sd">        Each sensitive feature&#39;s fairness adjustment is performed sequentially,</span>
 <span class="sd">        ensuring that each feature is treated fairly relative to the previous ones.</span>
-<span class="sd">    sensitive_features : pd.DataFrame</span>
+<span class="sd">    sensitive_features : Union[np.ndarray, pd.DataFrame]</span>
 <span class="sd">        Sensitive attribute data.</span>
 <span class="sd">    n_min : float</span>
 <span class="sd">        Below this threshold, compute the unfairness based on the Wasserstein distance.</span>
@@ -523,6 +528,11 @@ document.write(`
 <span class="sd">    &gt;&gt;&gt; print(unfs_dict)</span>
 <span class="sd">    {&#39;Base model&#39;: 46.0, &#39;color&#39;: 28.0, &#39;nb_child&#39;: 14.0}</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sensitive_features</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+        <span class="n">sensitive_features</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+            <span class="n">sensitive_features</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;sens</span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">sensitive_features</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])]</span>
+            <span class="p">)</span>
+
     <span class="n">unfairness_dict</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">y_fair</span> <span class="ow">in</span> <span class="n">y_fair_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="n">result</span> <span class="o">=</span> <span class="n">unfairness</span><span class="p">(</span><span class="n">y_fair</span><span class="p">,</span> <span class="n">sensitive_features</span><span class="p">,</span> <span class="n">n_min</span><span class="p">)</span>

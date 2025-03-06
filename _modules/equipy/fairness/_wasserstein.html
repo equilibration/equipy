@@ -261,7 +261,8 @@ document.write(`
 <span class="kn">from</span> <span class="nn">..utils.checkers</span> <span class="kn">import</span> <span class="n">_check_epsilon</span><span class="p">,</span> <span class="n">_check_epsilon_size</span><span class="p">,</span> <span class="n">_check_mod</span><span class="p">,</span> <span class="n">_check_shape</span><span class="p">,</span> <span class="n">_check_nb_observations</span><span class="p">,</span> <span class="n">_check_col</span><span class="p">,</span> <span class="n">_check_unique_mod</span>
 <span class="kn">from</span> <span class="nn">..metrics._fairness_metrics</span> <span class="kn">import</span> <span class="n">identity</span>
 <span class="kn">from</span> <span class="nn">._base</span> <span class="kn">import</span> <span class="n">BaseHelper</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">import</span> <span class="nn">random</span>
 
 
 <div class="viewcode-block" id="FairWasserstein"><a class="viewcode-back" href="../../../equipy.fairness.html#equipy.fairness.FairWasserstein">[docs]</a><span class="k">class</span> <span class="nc">FairWasserstein</span><span class="p">(</span><span class="n">BaseHelper</span><span class="p">):</span>
@@ -287,22 +288,23 @@ document.write(`
 <span class="sd">        Dictionary storing EQF (Empirical Quantile Function) objects for each sensitive modality.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sigma</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0001</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sigma</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0001</span><span class="p">,</span> <span class="n">seed</span> <span class="o">=</span> <span class="mi">2023</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sigma</span> <span class="o">=</span> <span class="n">sigma</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">modalities_calib</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">columns_calib</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
 
-<div class="viewcode-block" id="FairWasserstein.fit"><a class="viewcode-back" href="../../../equipy.fairness.html#equipy.fairness.FairWasserstein.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">sensitive_feature</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="FairWasserstein.fit"><a class="viewcode-back" href="../../../equipy.fairness.html#equipy.fairness.FairWasserstein.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">sensitive_feature</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Perform fit on the calibration data and save the ECDF, EQF, and weights of the sensitive variable.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        y : np.ndarray, shape (n_samples,)</span>
-<span class="sd">            The calibration labels.</span>
+<span class="sd">            The calibration predictions.</span>
 
-<span class="sd">        sensitive_feature : pd.DataFrame, shape (n_samples, 1)</span>
+<span class="sd">        sensitive_feature : Union[np.ndarray, pd.DataFrame], shape (n_samples, 1)</span>
 <span class="sd">            The calibration samples representing one single sensitive attribute.</span>
 
 <span class="sd">        Returns</span>
@@ -324,6 +326,11 @@ document.write(`
 <span class="sd">        &gt;&gt;&gt; wasserstein.fit(y, sensitive_feature)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">_check_shape</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">sensitive_feature</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sensitive_feature</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+            <span class="n">sensitive_feature</span> <span class="o">=</span> <span class="n">sensitive_feature</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> 
+            <span class="n">sensitive_feature</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+                <span class="n">sensitive_feature</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;sens</span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">sensitive_feature</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])]</span>
+                <span class="p">)</span>
         <span class="n">_check_unique_mod</span><span class="p">(</span><span class="n">sensitive_feature</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">modalities_calib</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_modalities</span><span class="p">(</span><span class="n">sensitive_feature</span><span class="p">)</span>
@@ -331,16 +338,16 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">_compute_weights</span><span class="p">(</span><span class="n">sensitive_feature</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_estimate_ecdf_eqf</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">sensitive_feature</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sigma</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="FairWasserstein.transform"><a class="viewcode-back" href="../../../equipy.fairness.html#equipy.fairness.FairWasserstein.transform">[docs]</a>    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">sensitive_feature</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<div class="viewcode-block" id="FairWasserstein.transform"><a class="viewcode-back" href="../../../equipy.fairness.html#equipy.fairness.FairWasserstein.transform">[docs]</a>    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">sensitive_feature</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">],</span> <span class="n">epsilon</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Transform the test data to enforce fairness using Wasserstein distance.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        y : np.ndarray, shape (n_samples,)</span>
-<span class="sd">            The target values of the test data.</span>
+<span class="sd">            The predictions of the test data.</span>
 
-<span class="sd">        sensitive_feature : pd.DataFrame, shape (n_samples, 1)</span>
+<span class="sd">        sensitive_feature : Union[np.ndarray, pd.DataFrame], shape (n_samples, 1)</span>
 <span class="sd">            The test samples representing a single sensitive attribute.</span>
 
 <span class="sd">        epsilon : float, optional (default=0)</span>
@@ -380,6 +387,11 @@ document.write(`
 
         <span class="n">_check_epsilon</span><span class="p">(</span><span class="n">epsilon</span><span class="p">)</span>
         <span class="n">_check_shape</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">sensitive_feature</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sensitive_feature</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+            <span class="n">sensitive_feature</span> <span class="o">=</span> <span class="n">sensitive_feature</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> 
+            <span class="n">sensitive_feature</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+                <span class="n">sensitive_feature</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;sens</span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">sensitive_feature</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])]</span>
+                <span class="p">)</span>
         <span class="n">modalities_test</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_modalities</span><span class="p">(</span><span class="n">sensitive_feature</span><span class="p">)</span>
         <span class="n">columns_test</span> <span class="o">=</span> <span class="n">sensitive_feature</span><span class="o">.</span><span class="n">columns</span>
         <span class="n">_check_mod</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">modalities_calib</span><span class="p">,</span> <span class="n">modalities_test</span><span class="p">)</span>
@@ -388,22 +400,22 @@ document.write(`
         <span class="n">y_fair</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fair_y_values</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">sensitive_feature</span><span class="p">,</span> <span class="n">modalities_test</span><span class="p">)</span>
         <span class="k">return</span> <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">epsilon</span><span class="p">)</span><span class="o">*</span><span class="n">y_fair</span> <span class="o">+</span> <span class="n">epsilon</span><span class="o">*</span><span class="n">y</span></div>
     
-    <span class="k">def</span> <span class="nf">fit_transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y_calib</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">sensitive_feature_calib</span><span class="p">:</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">y_test</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">sensitive_feature_test</span><span class="p">:</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">:</span><span class="nb">float</span><span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">fit_transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y_calib</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">sensitive_feature_calib</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">],</span> <span class="n">y_test</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">sensitive_feature_test</span><span class="p">:</span><span class="n">Union</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">],</span> <span class="n">epsilon</span><span class="p">:</span><span class="nb">float</span><span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Fit and transform the calibration and test data to enforce fairness using Wasserstein distance.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        y_calib : np.ndarray, shape (n_samples,)</span>
-<span class="sd">            The target values of the calibration data.</span>
+<span class="sd">            The prediction values of the calibration data.</span>
 
-<span class="sd">        sensitive_feature_calib : pd.DataFrame, shape (n_samples, 1)</span>
+<span class="sd">        sensitive_feature_calib : Union[np.ndarray, pd.DataFrame], shape (n_samples, 1)</span>
 <span class="sd">            The calibration samples representing a single sensitive attribute.</span>
 
 <span class="sd">        y_test : np.ndarray, shape (n_samples,)</span>
-<span class="sd">            The target values of the test data.</span>
+<span class="sd">            The prediction values of the test data.</span>
 
-<span class="sd">        sensitive_feature_test : pd.DataFrame, shape (n_samples, 1)</span>
+<span class="sd">        sensitive_feature_test : Union[np.ndarray, pd.DataFrame], shape (n_samples, 1)</span>
 <span class="sd">            The test samples representing a single sensitive attribute.</span>
 
 <span class="sd">        epsilon : float, optional (default=0)</span>
@@ -497,16 +509,16 @@ document.write(`
 
         <span class="bp">self</span><span class="o">.</span><span class="n">sigma</span> <span class="o">=</span> <span class="n">sigma</span>
 
-<div class="viewcode-block" id="MultiWasserstein.fit"><a class="viewcode-back" href="../../../equipy.fairness.html#equipy.fairness.MultiWasserstein.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">sensitive_features</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="MultiWasserstein.fit"><a class="viewcode-back" href="../../../equipy.fairness.html#equipy.fairness.MultiWasserstein.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">sensitive_features</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Perform fit on the calibration data and save the ECDF, EQF, and weights for each sensitive variable.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        y : np.ndarray, shape (n_samples,)</span>
-<span class="sd">            The calibration labels.</span>
+<span class="sd">            The calibration predictions.</span>
 
-<span class="sd">        sensitive_features : pd.DataFrame, shape (n_samples, n_sensitive_features)</span>
+<span class="sd">        sensitive_features : Union[np.ndarray, pd.DataFrame], shape (n_samples, n_sensitive_features)</span>
 <span class="sd">            The calibration samples representing multiple sensitive attributes.</span>
 
 <span class="sd">        Returns</span>
@@ -522,6 +534,12 @@ document.write(`
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">_check_nb_observations</span><span class="p">(</span><span class="n">sensitive_features</span><span class="p">)</span>
         <span class="n">_check_shape</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">sensitive_features</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sensitive_features</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sensitive_features</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">sensitive_features</span> <span class="o">=</span> <span class="n">sensitive_features</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">sensitive_features</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+                <span class="n">sensitive_features</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;sens</span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">sensitive_features</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])]</span>
+                <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">columns_calib_all</span> <span class="o">=</span> <span class="n">sensitive_features</span><span class="o">.</span><span class="n">columns</span>
 
         <span class="n">y_inter</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
@@ -563,16 +581,16 @@ document.write(`
                 <span class="bp">self</span><span class="o">.</span><span class="n">ecdf_all</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">wasserstein_instance</span><span class="o">.</span><span class="n">ecdf</span>
                 <span class="n">y_inter</span> <span class="o">=</span> <span class="n">wasserstein_instance</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">y_inter</span><span class="p">,</span> <span class="n">sensitive_features</span><span class="p">[[</span><span class="n">col</span><span class="p">]])</span></div>
     
-<div class="viewcode-block" id="MultiWasserstein.transform"><a class="viewcode-back" href="../../../equipy.fairness.html#equipy.fairness.MultiWasserstein.transform">[docs]</a>    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">sensitive_features</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<div class="viewcode-block" id="MultiWasserstein.transform"><a class="viewcode-back" href="../../../equipy.fairness.html#equipy.fairness.MultiWasserstein.transform">[docs]</a>    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">sensitive_features</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">],</span> <span class="n">epsilon</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Transform the calib and test data to enforce fairness using Wasserstein distance.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        y : np.ndarray, shape (n_samples,)</span>
-<span class="sd">            The target values of the test data.</span>
+<span class="sd">            The prediction values of the test data.</span>
 
-<span class="sd">        sensitive_features : pd.DataFrame shape (n_samples, n_sensitive_features)</span>
+<span class="sd">        sensitive_features : Union[np.ndarray, pd.DataFrame] shape (n_samples, n_sensitive_features)</span>
 <span class="sd">            The test samples representing multiple sensitive attributes.</span>
 
 <span class="sd">        epsilon : list, shape (n_sensitive_features,), optional (default=None)</span>
@@ -610,6 +628,12 @@ document.write(`
 <span class="sd">        &gt;&gt;&gt; print(fair_predictions)</span>
 <span class="sd">        [0.42483123 0.36412012 0.36172012 0.36112012]</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sensitive_features</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sensitive_features</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">sensitive_features</span> <span class="o">=</span> <span class="n">sensitive_features</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> 
+            <span class="n">sensitive_features</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+                <span class="n">sensitive_features</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;sens</span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">sensitive_features</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])]</span>
+                <span class="p">)</span>
         <span class="k">if</span> <span class="n">epsilon</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">sensitive_features</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
                 <span class="n">epsilon</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -651,22 +675,22 @@ document.write(`
             <span class="bp">self</span><span class="o">.</span><span class="n">y_fair</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">y_inter</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_fair</span><span class="p">[</span><span class="n">col</span><span class="p">]</span></div>
     
-    <span class="k">def</span> <span class="nf">fit_transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y_calib</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">sensitive_features_calib</span><span class="p">:</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">y_test</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">sensitive_features_test</span><span class="p">:</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span><span class="n">epsilon</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">fit_transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y_calib</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">sensitive_features_calib</span><span class="p">:</span><span class="n">Union</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">],</span> <span class="n">y_test</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">sensitive_features_test</span><span class="p">:</span><span class="n">Union</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">],</span><span class="n">epsilon</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Fit and transform the calibration and test data to enforce fairness using Wasserstein distance.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        y_calib : np.ndarray, shape (n_samples,)</span>
-<span class="sd">            The calibration labels.</span>
+<span class="sd">            The calibration predictions.</span>
 
-<span class="sd">        sensitive_features_calub : pd.DataFrame, shape (n_samples, n_sensitive_features)</span>
+<span class="sd">        sensitive_features_calub : Union[np.ndarray, pd.DataFrame], shape (n_samples, n_sensitive_features)</span>
 <span class="sd">            The calibration samples representing multiple sensitive attributes.</span>
 
 <span class="sd">        y_test : np.ndarray, shape (n_samples,)</span>
 <span class="sd">            The target values of the test data.</span>
 
-<span class="sd">        sensitive_features_test : pd.DataFrame shape (n_samples, n_sensitive_features)</span>
+<span class="sd">        sensitive_features_test : Union[np.ndarray, pd.DataFrame] shape (n_samples, n_sensitive_features)</span>
 <span class="sd">            The test samples representing multiple sensitive attributes.</span>
 
 <span class="sd">        epsilon : list, shape (n_sensitive_features,), optional (default=None)</span>
